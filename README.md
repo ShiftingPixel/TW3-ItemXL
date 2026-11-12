@@ -8,7 +8,7 @@ ItemXL runs as a plugin for the [Witcher 3 Script Extender (TW3SE)](https://www.
 
 ### Players
 
-Download the compiled ItemXL plugin from [Nexus Mods](https://www.nexusmods.com/games/witcher3/mods/15642) and follow the installation instructions on that page.
+Download the compiled ItemXL plugin from [Nexus Mods](https://www.nexusmods.com/witcher3/mods/15642) and follow the installation instructions on that page.
 
 ### Mod authors and developers
 
