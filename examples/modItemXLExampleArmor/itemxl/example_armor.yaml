@@ -1,0 +1,49 @@
+# ItemXL example: a new armor and matching gauntlets from one YAML file.
+# Install: this folder into <game>\Mods\.
+#
+# Shows YAML anchors (&name / *name / <<: *name, as in TweakXL): what both pieces share is written once.
+# Both look like the grandmaster Griffin set (same equip_template) and count for its set bonus (tag GryphonSet from $base).
+
+ability:
+  ItemXL Example Armor _Stats:
+    $base: Gryphon Armor 4 _Stats        # the grandmaster Griffin armor's values ...
+    armor: !scale 1.15                   # ... with 15 % more armor
+    slashing_resistance_perc: !offset 0.05
+  ItemXL Example Gauntlets _Stats:
+    $base: Gryphon Gloves 5 _Stats
+    armor: !scale 1.15
+    slashing_resistance_perc: !offset 0.02
+
+item:
+  ItemXL Example Armor:
+    $base: Gryphon Armor 4
+    price: !scale 1.1                    # 10 % more than the grandmaster armor
+    base_abilities:
+      - !remove Gryphon Armor 4 _Stats
+      - !append ItemXL Example Armor _Stats
+    $text:
+      name: {en: ItemXL Example Armor, de: ItemXL-Beispielrüstung}
+      description: {en: A Griffin armor made from a YAML file., de: "Eine Greifenrüstung, nur aus einer YAML-Datei."}
+    # &armorers: written once, used again below. _store__Rich_District_Armorer: the armorer on Hierarch Square in
+    # Novigrad (novigrad_rich_district_armorer_01.w2ent; he also sells the map to the enhanced Griffin gear)
+    $sell: &armorers [_store__Rich_District_Armorer]
+    $recipe: &recipe
+      crafter: Armorer
+      level: Grand Master                # grandmaster gear: crafted in Toussaint
+      price: 250
+      ingredients: {Dwimeryte ingot: 3, Draconide leather: 2, Glowing ingot: 4}
+      sell: *armorers
+
+  ItemXL Example Gauntlets:
+    $base: Gryphon Gloves 5
+    price: !scale 1.1
+    base_abilities:
+      - !remove Gryphon Gloves 5 _Stats
+      - !append ItemXL Example Gauntlets _Stats
+    $text:
+      name: {en: ItemXL Example Gauntlets, de: ItemXL-Beispielhandschuhe}
+    $sell: *armorers
+    $recipe:
+      <<: *recipe                        # the armor's recipe ...
+      price: 120                         # ... with its own price and ingredients
+      ingredients: {Dwimeryte ingot: 1, Draconide leather: 1}

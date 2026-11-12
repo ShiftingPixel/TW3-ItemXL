@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<redxml>
+<definitions>
+<items>
+	<item name="Bodkin Bolt" on_conflict="extend" price="9">
+		<tags>ExtendTag</tags>
+		<base_abilities>
+			<a>bodkin_bolt _Stats</a>
+		</base_abilities>
+	</item>
+	<item name="Blunt Bolt" on_conflict="extend" price="8" />
+</items>
+</definitions>
+</redxml>

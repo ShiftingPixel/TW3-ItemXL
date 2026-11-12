@@ -1,0 +1,5 @@
+# A line added to a vanilla item's description: the game's own text stays in front, in every language.
+item:
+  Novigraadan sword 4_crafted:
+    $text:
+      description: !append {en: Second line., de: Zweite Zeile.}

@@ -1,0 +1,33 @@
+{
+  "about": "A broken YAML is reported with its line; the other mods are still built",
+  "mods": {
+    "modBroken": {
+      "own": "Mods/modBroken"
+    },
+    "modFine": {
+      "own": "Mods/modFine"
+    }
+  },
+  "settings": {
+    "modBroken": [
+      1,
+      0
+    ],
+    "modFine": [
+      1,
+      1
+    ]
+  },
+  "expect": {
+    "errors": 1,
+    "errors_contain_cpp": [
+      "modBroken: itemxl/broken.yaml: line 3"
+    ],
+    "contains": [
+      [
+        "gameplay/items/def_item_bolts.xml",
+        "stackable=\"50\""
+      ]
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+item:
+  Bodkin Bolt:
+    $text:
+      name: {zh: "弩箭"}   # only Chinese: the other languages keep the game's name

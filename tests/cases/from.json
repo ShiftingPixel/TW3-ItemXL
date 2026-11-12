@@ -1,0 +1,27 @@
+{
+  "about": "!append-from / !prepend-from read the same list of other records (the copy of the same set), and the armor example (YAML anchors)",
+  "mods": {
+    "modFrom": {"own": "Mods/modFrom"},
+    "modItemXLExampleArmor": {"project": "examples/modItemXLExampleArmor"}
+  },
+  "settings": {
+    "modFrom": [1, 0],
+    "modItemXLExampleArmor": [1, 1]
+  },
+  "expect": {
+    "conflicts": 0,
+    "warnings": 0,
+    "errors": 1,
+    "errors_contain_cpp": ["tags: !append-from 'No Such Item' does not exist"],
+    "contains": [
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "mod_origin_novigraad, Armor, MediumArmor, GryphonSet, mod_armor, mod_legendary </tags>"],
+      ["dlc/dlcitemxl/data/gameplay/items_plus/itemxl.xml", "GryphonSet, mod_armor, mod_legendary, SetBonusPiece </tags>"],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "<a>Default armor _Stats</a>"],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "<item name=\"ItemXL Example Armor\""],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "<item name=\"ItemXL Example Gauntlets\""],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "craftedItem_name=\"ItemXL Example Gauntlets\" craftsmanLevel_name=\"Grand Master\" craftsmanType_name=\"Armorer\" price=\"120\""],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "craftedItem_name=\"ItemXL Example Armor\" craftsmanLevel_name=\"Grand Master\" craftsmanType_name=\"Armorer\" price=\"250\""],
+      ["gameplay/items/def_loot_shops.xml", "<loot_entry name=\"ItemXL Example Gauntlets schematic\""]
+    ]
+  }
+}

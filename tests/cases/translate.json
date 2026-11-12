@@ -1,0 +1,73 @@
+{
+  "about": "$text with one language on an existing record: that language gets the new text, every other language keeps the record's own text; an !append without en translates another mod's appended line instead of adding one",
+  "mods": {
+    "modZh": {
+      "own": "Mods/modZh"
+    },
+    "modLine": {
+      "own": "Mods/modLine"
+    },
+    "modLineDe": {
+      "own": "Mods/modLineDe"
+    }
+  },
+  "settings": {
+    "modZh": [
+      1,
+      0
+    ],
+    "modLine": [
+      1,
+      1
+    ],
+    "modLineDe": [
+      1,
+      2
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "errors": 0,
+    "warnings": 0,
+    "texts": [
+      [
+        "zh",
+        "弩箭"
+      ],
+      [
+        "en",
+        "= Bolts"
+      ],
+      [
+        "de",
+        "= Bolzen"
+      ],
+      [
+        "de",
+        "Zusatzzeile zum Testen."
+      ],
+      [
+        "en",
+        "Extra line for tests."
+      ],
+      [
+        "fr",
+        "Extra line for tests."
+      ]
+    ],
+    "absent_texts": [
+      [
+        "en",
+        "Zusatzzeile"
+      ],
+      [
+        "fr",
+        "Zusatzzeile"
+      ],
+      [
+        "de",
+        "Alte Zeile."
+      ]
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+# ItemXL alchemy test: a potion, a bomb, an oil and a decoction with their own recipes ($alchemy).
+# Hattori in Novigrad sells the four recipes. Read one, then brew it at a campfire / in the alchemy menu.
+# The recipe names follow the game's word for each kind: "Manuscript page:" (potion, bomb, oil),
+# "Torn-out page:" (decoction), in every language.
+
+ability:
+  ItemXL Test Potion _Stats:
+    $base: Swallow_1                       # Swallow's effect ...
+    ammo: {min: 5}                         # ... with 5 uses instead of 3 (meditation refills them)
+
+item:
+  ItemXL Test Potion:
+    $base: Swallow 1                       # heals like Swallow
+    base_abilities:
+      - !remove Swallow_1
+      - !append ItemXL Test Potion _Stats
+    $text:
+      name: {en: ItemXL Test Potion, de: ItemXL-Testtrank}
+    $alchemy:
+      ingredients: {Celandine: 1, Dwarven spirit: 1}
+      price: 15                            # price of the recipe
+      sell: [_store__Hattori_Master_Blacksmith]
+
+  ItemXL Test Bomb:
+    $base: Grapeshot 1
+    $text:
+      name: {en: ItemXL Test Bomb, de: ItemXL-Testbombe}
+    $alchemy:
+      ingredients: {Saltpetre: 1, Arenaria: 1}
+      sell: [_store__Hattori_Master_Blacksmith]
+
+  ItemXL Test Oil:
+    $base: Beast Oil 1
+    $text:
+      name: {en: ItemXL Test Oil, de: ItemXL-Testöl}
+    $alchemy:
+      ingredients: {Dog tallow: 1, Wolfsbane: 1}
+      rarity: Relic                        # orange recipe
+      sell: [_store__Hattori_Master_Blacksmith]
+
+  ItemXL Test Decoction:
+    $base: Mutagen 1
+    $text:
+      name: {en: ItemXL Test Decoction, de: ItemXL-Testabsud}
+    $alchemy:
+      ingredients: {Dwarven spirit: 1, Nekker heart: 1}
+      sell: [_store__Hattori_Master_Blacksmith]

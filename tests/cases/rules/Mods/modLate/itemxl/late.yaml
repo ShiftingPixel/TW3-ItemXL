@@ -1,0 +1,5 @@
+# Priority would let modEarly win; $after puts this file after it
+$after: [modEarly]
+item:
+  Bodkin Bolt:
+    price: 22

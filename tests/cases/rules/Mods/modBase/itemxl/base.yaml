@@ -1,0 +1,7 @@
+item:
+  Rule Steel Aerondight:
+    $base: Aerondight EP2
+    category: steelsword
+    equip_slot: steel_sword_back_slot
+    $text:
+      name: {en: Rule Steel Aerondight}

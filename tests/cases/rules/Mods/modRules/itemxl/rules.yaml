@@ -1,0 +1,20 @@
+# $requires that holds, $where over the game's and another mod's items, $if per record and per document
+$requires: [modBase]
+item:
+  Every Aerondight:
+    $where: {tags: Aerondight, name: "*Aerondight*"}
+    enhancement_slots: 5
+  Cheap legendary bolts:
+    $where: {category: bolt, name: "*Legendary", price: ">=1"}
+    weight: 0.01
+  Blunt Bolt:
+    $if: {mod: modBase, item: Rule Steel Aerondight}
+    price: 77
+  Bait Bolt:
+    $if: {mod: modNotThere}
+    price: 999
+---
+$if: {not: {item: Rule Steel Aerondight}}
+item:
+  Broadhead Bolt:
+    price: 555

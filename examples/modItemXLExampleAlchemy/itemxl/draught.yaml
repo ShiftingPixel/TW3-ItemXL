@@ -1,0 +1,52 @@
+# ItemXL example: a potion in two levels and a bomb, with the recipes the player reads to brew them ($alchemy).
+# Install: this folder into <game>\Mods\.
+# Where: the herbalist of White Orchard (the first area of the game) sells the first recipe, the herbalist of
+# Kaer Trolde on Skellige the second; the alchemists of Toussaint (Blood and Wine) sell the bomb's.
+
+ability:
+  ItemXL Draught 1 _Stats:
+    $base: Swallow_1                         # Swallow's healing ...
+    ammo: {min: 4}                           # ... 4 uses instead of 3; meditating refills them
+  ItemXL Draught 2 _Stats:
+    $base: Swallow_2
+    ammo: {min: 5}
+
+item:
+  ItemXL Draught 1:
+    $base: Swallow 1                         # heals like Swallow
+    base_abilities:
+      - !remove Swallow_1
+      - !append ItemXL Draught 1 _Stats
+    $text:
+      name: {en: Draught of the Wells, de: Brunnentrank}
+    $alchemy:
+      group: itemxl_draught                  # both levels are one brew ...
+      level: 1
+      ingredients: {Dwarven spirit: 1, Celandine: 2, Arenaria: 1}
+      price: 20                              # price of the recipe item
+      sell: [_store__Herbalist]
+
+  ItemXL Draught 2:
+    $base: Swallow 2
+    base_abilities:
+      - !remove Swallow_2
+      - !append ItemXL Draught 2 _Stats
+    $text:
+      name: {en: Enhanced Draught of the Wells, de: Verbesserter Brunnentrank}
+    $alchemy:
+      group: itemxl_draught                  # ... so brewing level 2 takes level 1 away
+      level: 2
+      # as in the game, the lower level is an ingredient: a new item of the mod works like any other
+      ingredients: {Alcohest: 1, ItemXL Draught 1: 1, Celandine: 4}
+      price: 60
+      rarity: Relic                          # orange name: a rare recipe
+      sell: [_store__Kaer_Trolde_Herbalist]
+
+  ItemXL Ember Bomb:
+    $base: Dancing Star 1                    # a fire bomb; its game recipe makes the new recipe a bomb recipe
+    $text:
+      name: {en: Ember Bomb, de: Glutbombe}
+      description: {en: "A Dancing Star, brewed from a recipe of a mod.", de: "Ein Tanzender Stern, gebraut nach dem Rezept eines Mods."}
+    $alchemy:
+      ingredients: {Saltpetre: 1, Sulfur: 2, Arenaria: 1}
+      sell: [_EP2_store__Alchemist]

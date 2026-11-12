@@ -1,0 +1,30 @@
+{
+  "about": "DLC copies with on_conflict=\"extend\" (in a DLC folder and inside a mod's bundle): a change also goes to every such copy that sets the field itself; tags: only !remove (the game joins tag lists); base_abilities: all of it (the copy's list replaces the game's)",
+  "mods": {
+    "modExt": {"own": "Mods/modExt"},
+    "modBundleDlc": {"pack": "Mods/modBundleDlc"}
+  },
+  "dlc": {"dlcext": {"pack": "dlc/dlcext"}},
+  "settings": {"modExt": [1, 0], "modBundleDlc": [1, 1]},
+  "expect": {
+    "conflicts": 0,
+    "warnings": 0,
+    "report_contains": ["price also set by dlc/dlcext/data/gameplay/items/ext_bolts.xml",
+                        "price also set by dlc/dlcbundle/data/gameplay/items/bundle_bolts.xml"],
+    "contains": [
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "price=\"30\""],
+      ["dlc/dlcext/data/gameplay/items_plus/ext_bolts.xml", "price=\"30\""],
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "price=\"31\""],
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "<a>Default weapon _Stats</a>"],
+      ["dlc/dlcbundle/data/gameplay/items/bundle_bolts.xml", "price=\"32\""],
+      ["dlc/dlcbundle/data/gameplay/items_plus/bundle_bolts.xml", "price=\"32\""],
+      ["gameplay/items/def_item_bolts.xml", "weight=\"0.5\""],
+      ["gameplay/items/def_item_bolts.xml", "YamlTag"]
+    ],
+    "absent": [
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "weight="],
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "YamlTag"],
+      ["dlc/dlcext/data/gameplay/items/ext_bolts.xml", "ExtendTag"]
+    ]
+  }
+}

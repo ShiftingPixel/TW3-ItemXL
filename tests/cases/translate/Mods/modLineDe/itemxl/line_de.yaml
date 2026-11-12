@@ -1,0 +1,4 @@
+item:
+  Bodkin Bolt:
+    $text:
+      description: !append {de: "Zusatzzeile zum Testen."}   # translates the line of modLine (replacing its de), adds none

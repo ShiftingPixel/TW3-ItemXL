@@ -1,0 +1,12 @@
+ability:
+  silver_bolt _Stats:
+    $base: bodkin_bolt _Stats
+    SilverDamage: {min: 40, max: 40}
+item:
+  Silver Bolt:
+    $base: Bodkin Bolt
+    price: 30
+    base_abilities: {"!remove": [bodkin_bolt _Stats], "!append": [silver_bolt _Stats]}
+  Silver Bolt Bundle:
+    $xml: '<item name="Silver Bolt Bundle" category="junk" price="5"/>'
+    $file: gameplay\items\def_item_bolts.xml   # into the game's file, not ItemXL's DLC

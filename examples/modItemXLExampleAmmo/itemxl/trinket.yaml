@@ -1,0 +1,16 @@
+# ItemXL example, second file of the same mod: a record written as XML, and loot that enemies drop.
+# A mod can have as many YAML files as it likes; each one can hold one topic.
+
+item:
+  ItemXL Drowner Charm:
+    # $xml: the whole record by hand, as in the game's files. Useful when no record is a good $base.
+    $xml: >-
+      <item name="ItemXL Drowner Charm" category="junk" price="25" weight="0.1" stackable="100"
+      icon_path="icons/inventory/other/preciousornament.dds"><tags>mod_junk</tags></item>
+    $text:
+      name: {en: Drowner charm, de: Ertrunkenen-Talisman}
+      description: {en: Some drowners carry these. Merchants pay well for them., de: Manche Ertrunkene tragen so etwas. Händler zahlen gut dafür.}
+    $loot:
+      # chance is a weight, not a percentage: 50 against the drowners' other entries (100 together), so it is a
+      # third of the draws; a drowner hands out 0 to 2 things, so about every third drowner drops it
+      _monster__Drowner: {chance: 50}

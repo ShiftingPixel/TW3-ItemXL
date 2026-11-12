@@ -1,0 +1,243 @@
+{
+  "about": "All example mods together (examples/): new items, $instances, $xml, $sell/$loot with fields, $recipe with rarity and quantity, $alchemy with levels of one brew, rules ($where, $if with any/not, $requires, $after), a change to one copy, a loot list's own count, !scale/!offset/null on stats, counted lists, a translation mod ($text and !append without en), and diagram and recipe names that follow the item's name in every language",
+  "mods": {
+    "modItemXLExampleBlade": {
+      "project": "examples/modItemXLExampleBlade"
+    },
+    "modItemXLExampleArmor": {
+      "project": "examples/modItemXLExampleArmor"
+    },
+    "modItemXLThirdHit": {
+      "project": "examples/modItemXLThirdHit"
+    },
+    "modItemXLExampleAmmo": {
+      "project": "examples/modItemXLExampleAmmo"
+    },
+    "modItemXLExampleBalance": {
+      "project": "examples/modItemXLExampleBalance"
+    },
+    "modItemXLExampleTranslation": {
+      "project": "examples/modItemXLExampleTranslation"
+    },
+    "modItemXLExampleAlchemy": {
+      "project": "examples/modItemXLExampleAlchemy"
+    }
+  },
+  "settings": {
+    "modItemXLExampleBlade": [
+      1,
+      0
+    ],
+    "modItemXLExampleArmor": [
+      1,
+      1
+    ],
+    "modItemXLThirdHit": [
+      1,
+      2
+    ],
+    "modItemXLExampleAmmo": [
+      1,
+      3
+    ],
+    "modItemXLExampleBalance": [
+      1,
+      4
+    ],
+    "modItemXLExampleTranslation": [
+      1,
+      5
+    ],
+    "modItemXLExampleAlchemy": [
+      1,
+      6
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "errors": 0,
+    "warnings": 0,
+    "written": [
+      "dlc/dlcitemxl/dlcitemxl.reddlc",
+      "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+      "dlc/dlcitemxl/data/gameplay/items_plus/itemxl.xml"
+    ],
+    "contains": [
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Example Blade\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "enhancement_slots=\"3\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<a>ItemXL Example Blade _Stats</a>"
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<ability name=\"ItemXL Example Blade _Stats\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "min=\"287.5\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Example Blade schematic\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<schematic name_name=\"ItemXL Example Blade schematic\" craftedItem_name=\"ItemXL Example Blade\" craftsmanLevel_name=\"Master\" craftsmanType_name=\"Smith\" price=\"120\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "localisation_key_name=\"itemxl_item_name_itemxl_example_blade\""
+      ],
+      [
+        "gameplay/items/def_loot_shops.xml",
+        "<loot_entry name=\"ItemXL Example Blade\""
+      ],
+      [
+        "gameplay/items/def_loot_shops.xml",
+        "<loot_entry name=\"ItemXL Example Blade schematic\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "</definitions>\r\n\t<custom>"
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<a>Magic _Stats</a>"
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Heavy Bolt\" category=\"bolt\" price=\"135\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Master Bolt\" category=\"bolt\" price=\"220\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "craftedItemQuantity=\"10\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<a>Relic _Stats</a>"
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Drowner Charm\" category=\"junk\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Example Armor\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "ItemXLThirdHit"
+      ],
+      [
+        "gameplay/items/def_loot_monsters.xml",
+        "<loot_entry name=\"ItemXL Drowner Charm\""
+      ],
+      [
+        "dlc/bob/data/gameplay/items/def_loot_shops.xml",
+        "quantity_min=\"5\" quantity_max=\"20\""
+      ],
+      [
+        "gameplay/items/def_item_weapons.xml",
+        "<parts count=\"3\">Iron ingot</parts>"
+      ],
+      [
+        "gameplay/items/def_item_weapons.xml",
+        "<SlashingDamage type=\"base\" min=\"30\" max=\"30\" />"
+      ],
+      [
+        "gameplay/items/def_item_ingredients.xml",
+        "price=\"15\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<recipe name_name=\"ItemXL Draught 2 recipe\" type_name=\"itemxl_draught\" level=\"2\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "cookedItemType=\"petard\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<ingredient item_name=\"ItemXL Draught 1\" quantity=\"1\""
+      ],
+      [
+        "gameplay/items/def_loot_shops.xml",
+        "<loot_entry name=\"ItemXL Draught 1 recipe\""
+      ],
+      [
+        "dlc/bob/data/gameplay/items/def_loot_shops.xml",
+        "<loot_entry name=\"ItemXL Ember Bomb recipe\""
+      ],
+      [
+        "gameplay/items_plus/def_item_bolts.xml",
+        "<item name=\"Explosive Bolt\" category=\"bolt\" price=\"264\""
+      ],
+      [
+        "gameplay/items/def_loot_monsters.xml",
+        "quantity_max=\"3\""
+      ]
+    ],
+    "absent": [
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "Novigraadan sword 4_crafted _Stats</a>"
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<definitions>\r\n\t\t<custom>"
+      ],
+      [
+        "gameplay/items/def_item_bolts.xml",
+        "price=\"264\""
+      ]
+    ],
+    "not_written": [
+      "gameplay/items/def_item_crafting_weapons.xml"
+    ],
+    "texts": [
+      [
+        "de",
+        "Schema: Hexer-Beispielschwert"
+      ],
+      [
+        "zh",
+        "藍圖：獵魔人範例之劍"
+      ],
+      [
+        "zh",
+        "每第三次命中造成雙倍傷害。"
+      ],
+      [
+        "pl",
+        "Schemat: Witcher's Example Blade"
+      ],
+      [
+        "de",
+        "Schema: Schwerer Bolzen (ItemXL)"
+      ],
+      [
+        "en",
+        "Drowner charm"
+      ],
+      [
+        "de",
+        "Manuskriptseite: Verbesserter Brunnentrank"
+      ],
+      [
+        "en",
+        "Manuscript page: Ember Bomb"
+      ]
+    ]
+  }
+}

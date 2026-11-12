@@ -1,0 +1,28 @@
+# ItemXL example: a new sword from one YAML file. No REDkit, no DLC folder, no .w3strings.
+# Install: this folder into <game>\Mods\.
+# Needs ItemXL and TW3SE (TW3SE shows the names and descriptions from $text).
+
+ability:
+  ItemXL Example Blade _Stats:
+    $base: Novigraadan sword 4_crafted _Stats      # copy of a crafted Novigrad sword ...
+    SlashingDamage: !scale 1.25                    # ... that hits 25 % harder
+    quality: {type: add, min: 4}
+
+item:
+  ItemXL Example Blade:
+    $base: Novigraadan sword 4_crafted             # looks and handles like that sword (same equip_template)
+    price: 400
+    enhancement_slots: 3
+    base_abilities:
+      - !remove Novigraadan sword 4_crafted _Stats
+      - !append ItemXL Example Blade _Stats
+    $text:
+      name: {en: "Witcher's Example Blade", de: Beispielklinge des Hexers}
+      description: {en: A sword made from nothing but a YAML file., de: "Ein Schwert, nur aus einer YAML-Datei."}
+    $sell: [_store__Hattori_Master_Blacksmith]     # Hattori in Novigrad sells it
+    $recipe:                                       # ... and the diagram, to craft it at a master smith
+      crafter: Smith
+      level: Master
+      price: 120
+      ingredients: {Steel ingot: 2, Leather straps: 1, Dark iron ore: 1}
+      sell: [_store__Hattori_Master_Blacksmith]

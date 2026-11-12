@@ -1,0 +1,75 @@
+{
+  "about": "$alchemy: a potion, a bomb, an oil and a decoction with their recipes; the recipe item's name is the game's page word plus the item's name in every language",
+  "mods": {
+    "modItemXLAlchemyTest": {
+      "own": "Mods/modItemXLAlchemyTest"
+    }
+  },
+  "settings": {
+    "modItemXLAlchemyTest": [
+      1,
+      0
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "errors": 0,
+    "warnings": 0,
+    "contains": [
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<recipe name_name=\"ItemXL Test Potion recipe\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "cookedItemType=\"petard\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "cookedItemType=\"oil\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "cookedItemType=\"mutagen_potion\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<item name=\"ItemXL Test Bomb recipe\" category=\"alchemy_recipe\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<alchemy_recipes>"
+      ],
+      [
+        "gameplay/items/def_loot_shops.xml",
+        "<loot_entry name=\"ItemXL Test Oil recipe\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<ability name=\"ItemXL Test Potion _Stats\""
+      ],
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "<ammo type=\"add\" min=\"5\""
+      ]
+    ],
+    "texts": [
+      [
+        "de",
+        "Manuskriptseite: ItemXL-Testtrank"
+      ],
+      [
+        "de",
+        "Herausgerissene Seite: ItemXL-Testabsud"
+      ],
+      [
+        "en",
+        "Manuscript page: ItemXL Test Bomb"
+      ],
+      [
+        "pl",
+        "Stronica z manuskryptu: ItemXL Test Oil"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+# ItemXL example: changing what the game already has, without naming every record (rules).
+# Install: this folder into <game>\Mods\. Look at the report: [where] lists what each rule changed.
+
+item:
+  # One record by name: a plain value replaces the game's value.
+  Candle:
+    price: 15
+    tags: !append [ItemXLExampleTag]         # adds to the list; a plain list would replace it
+
+  # A rule ($where) instead of a name: the key is only a label for the report.
+  Every crossbow costs more:
+    $where: {category: crossbow}
+    price: !scale 1.2                        # 20 % more, for every crossbow, also new ones of other mods
+
+  Starter swords give more iron:
+    $where: {category: steelsword, tags: [PlayerSteelWeapon], name: "Long Steel Sword*"}
+    recycling_parts: {Iron ingot: 3}         # a counted list: sets this entry, keeps Leather squares
+
+  # " | <file>": only this copy of the record. New Game Plus uses the items_plus files: there, exploding bolts cost double.
+  Explosive Bolt | gameplay\items_plus\def_item_bolts.xml:
+    price: !scale 2
+
+loot:
+  # A loot list itself, not an entry: up to three things per drowner instead of two.
+  _monster__Drowner:
+    quantity_max: 3
+
+ability:
+  Long Steel Sword _Stats:
+    SlashingDamage: !offset 6                # 6 more damage; !scale and !offset add up with other mods
+    weight: !scale 0.8
+    armor_reduction: null                    # null removes the stat
+
+---
+# A second document in the same file, with its own condition ($if). It applies only when the ammo example is
+# installed, so the two examples fit each other without a separate patch mod.
+$if: {mod: modItemXLExampleAmmo}
+item:
+  ItemXL Heavy Bolt:
+    price: !scale 0.9
+
+---
+# $if with "not" and "any": only when neither ammo example nor the armor example is installed.
+$if: {not: {any: [{mod: modItemXLExampleAmmo}, {mod: modItemXLExampleArmor}]}}
+item:
+  Explosive Bolt:
+    price: !offset -20

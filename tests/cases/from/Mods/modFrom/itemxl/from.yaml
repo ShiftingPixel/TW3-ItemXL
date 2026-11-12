@@ -1,0 +1,9 @@
+# !append-from / !prepend-from: the same list of another record, as it is at that point of the build.
+item:
+  ItemXL From Sword:
+    $base: Novigraadan sword 4_crafted
+    tags: !append-from Gryphon Armor 3            # items_plus copy has SetBonusPiece, items copy not
+    base_abilities: !prepend-from [Bear Armor 3]
+  ItemXL From Missing:
+    $base: Novigraadan sword 4_crafted
+    tags: !append-from No Such Item

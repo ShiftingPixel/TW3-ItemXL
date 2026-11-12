@@ -1,0 +1,16 @@
+{
+  "about": "The diagram name takes the game's word for 'diagram' in every language from its w3strings",
+  "mods": {"modLangTest": {"own": "Mods/modLangTest"}},
+  "settings": {"modLangTest": [1, 0]},
+  "expect": {
+    "conflicts": 0,
+    "texts": [
+      ["en", "= Diagram: Language Blade"],
+      ["de", "= Schema: Sprachklinge"],
+      ["fr", "= Schéma : Lame des langues"],
+      ["jp", "= 設計図：言語の刃"],
+      ["pl", "= Schemat: Ostrze języków"],
+      ["ru", "= Чертёж: Клинок языков"]
+    ]
+  }
+}

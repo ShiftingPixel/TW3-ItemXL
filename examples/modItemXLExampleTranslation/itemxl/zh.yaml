@@ -1,0 +1,20 @@
+# ItemXL example: a translation mod for another mod. It changes no values, only texts.
+# Install: this folder into <game>\Mods\, next to modItemXLExampleBlade.
+$requires: [modItemXLExampleBlade]          # without the blade there is nothing to translate: one clear error
+$after: [modItemXLExampleBlade]             # applied after the blade, whatever the load order says
+
+item:
+  ItemXL Example Blade:
+    $text:
+      # Only the languages written here change. Chinese is new, German is replaced by a better translation,
+      # English stays as the blade mod has it. The diagram gets the game's word for "diagram" in every language.
+      name: {zh: 獵魔人範例之劍, de: Hexer-Beispielschwert}
+      description: {zh: 一把僅由 YAML 檔案製成的劍。}
+
+---
+# The script example appends a line to the description. Without en, !append adds no line but translates that one.
+$if: {mod: modItemXLThirdHit}
+item:
+  ItemXL Example Blade:
+    $text:
+      description: !append {zh: "<font color='#FF6060'>每第三次命中造成雙倍傷害。</font>"}

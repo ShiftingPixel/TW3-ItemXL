@@ -1,0 +1,10 @@
+# ItemXL example, YAML part: which weapons get the "every 3rd hit deals double damage" of the script.
+# Any weapon works: add the tag ItemXLThirdHit to it. The line in the description shows it in the tooltip,
+# in light red (<font color=...>, a colour as in HTML).
+item:
+  ItemXL Example Blade:
+    tags: !append [ItemXLThirdHit]
+    $text:
+      description: !append
+        en: "<font color='#FF6060'>Every third hit deals double damage.</font>"
+        de: "<font color='#FF6060'>Jeder dritte Treffer verursacht doppelten Schaden.</font>"

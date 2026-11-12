@@ -1,0 +1,15 @@
+item:
+  Bodkin Bolt:
+    price: 5                     # modWholeFiles sets 2 -> conflict, reported
+    weight: {"!scale": 0.5}      # stacks
+    tags: {"!append": [BoltTweaks]}
+  Bodkin Bolt | gameplay\items_plus\def_item_bolts.xml:
+    stackable: 77                # only the New Game Plus copy
+  Blunt Bolt:
+    icon_path: null              # removes the attribute
+    base_abilities: !set [blunt_bolt _Stats]
+    tags: {"!xml": "<tags>WeaponTab, bolt, XmlTag</tags>"}
+  Bait Bolt: null                # removes the record
+ability:
+  explosive_bolt _Stats:
+    SilverDamage: {"!offset": 10}   # stacks

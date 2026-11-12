@@ -1,0 +1,24 @@
+# ItemXL example: many records from one ($instances), a recipe that makes several items, merchants with quantities.
+# Install: this folder into <game>\Mods\.
+# Where: the blacksmiths of Toussaint (Blood and Wine) sell the bolts and their diagrams.
+
+item:
+  ItemXL $(kind) Bolt:                       # $(kind) is filled in from each entry below
+    $base: Explosive Bolt                    # looks, flies, and explodes like the game's exploding bolt
+    $instances:
+      - {kind: Heavy, de: Schwerer Bolzen, price: 150, rarity: Magic}
+      - {kind: Master, de: Meisterbolzen, price: 220, rarity: Relic}
+    price: $(price)                          # values can use the keys of the entry as well
+    $text:
+      name: {en: ItemXL $(kind) bolt, de: $(de) (ItemXL)}
+    $sell:
+      _EP2_store__Blacksmith: {quantity_min: 5, quantity_max: 20}   # a stack of 5 to 20 each time
+    $recipe:
+      crafter: Smith
+      level: Journeyman
+      rarity: $(rarity)                      # quality of the diagram (Magic: yellow, Relic: orange)
+      quantity: 10                           # one crafting makes 10 bolts
+      diagram_price: 40                      # price of the diagram itself
+      price: 30                              # what the smith takes
+      ingredients: {Iron ingot: 1, Timber: 2}
+      sell: [_EP2_store__Blacksmith]

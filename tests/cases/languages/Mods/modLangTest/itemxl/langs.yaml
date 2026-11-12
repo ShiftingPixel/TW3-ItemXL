@@ -1,0 +1,7 @@
+# Diagram names in several languages: the prefix comes from the game's own texts.
+item:
+  ItemXL Language Blade:
+    $base: Novigraadan sword 4_crafted
+    $text:
+      name: {en: Language Blade, de: Sprachklinge, fr: Lame des langues, jp: 言語の刃, pl: Ostrze języków, ru: Клинок языков}
+    $recipe: {crafter: Smith, level: Master, ingredients: {Steel ingot: 1}}

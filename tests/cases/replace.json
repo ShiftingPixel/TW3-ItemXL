@@ -1,0 +1,36 @@
+{
+  "about": "A DLC folder of a mod redefines a game item with on_conflict=\"replace\". A change has to reach the game's copy and the replacing copy, in items and items_plus.",
+  "mods": {
+    "modSlots": {
+      "own": "Mods/modSlots"
+    }
+  },
+  "dlc": {
+    "dlctest": {
+      "pack": "dlc/dlctest"
+    }
+  },
+  "settings": {
+    "modSlots": [
+      1,
+      0
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "contains": [
+      [
+        "dlc/ep1/data/gameplay/items/def_item_weapons.xml",
+        "enhancement_slots=\"5\""
+      ],
+      [
+        "dlc/dlctest/data/gameplay/items/test_weapons.xml",
+        "enhancement_slots=\"5\""
+      ],
+      [
+        "dlc/dlctest/data/gameplay/items_plus/test_weapons.xml",
+        "enhancement_slots=\"5\""
+      ]
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+plugin/out/
+__pycache__/
+*.pyc
+local_paths.json
+tests/work/
+third_party/*
+!third_party/.gitkeep
+.zig-cache/

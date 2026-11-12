@@ -1,0 +1,40 @@
+# comments, quoting, numbers, tags
+item:
+  "Quoted Name": {price: 010, weight: 0.30, flag: yes, nothing: ~, txt: 'it''s', esc: "a\tb\u00e4"}
+  Plain Name With Spaces:
+    tags: !append-once [A, B]   # trailing comment
+    base_abilities:
+      - !remove old one
+      - !prepend new one
+    list_block:
+      - one
+      - two: 2
+        three: 3
+      - [x, y]
+    weight: !scale 1.5
+    hex: 0x1F
+    neg: -12
+    sci: 1e3
+    float_exp: 1.5e+3
+    colon_in: a:b
+    url: http://x.y/z
+    hash_in: a#b
+  Multi Line Flow: {a: 1,
+    b: [1,
+        2]}
+loot:
+  shop:
+    loot_entry: !append
+      - {name: Fire Bolt, chance: 100}
+      - {name: "Frost: Bolt", chance: -1}
+    other: !remove
+---
+second:
+  doc: true
+  empty:
+  folded: >
+    one
+    two
+  literal: |
+    line1
+    line2

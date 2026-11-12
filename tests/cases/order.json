@@ -1,0 +1,34 @@
+{
+  "about": "New records first, then changes: a mod that changes or copies ($base) another mod's new item works in either load order; $text description !append",
+  "mods": {
+    "modItemXLThirdHit": {"project": "examples/modItemXLThirdHit"},
+    "modItemXLExampleBlade": {"project": "examples/modItemXLExampleBlade"},
+    "modDescVanilla": {"own": "Mods/modDescVanilla"},
+    "modLinked": {"own": "Mods/modLinked"}
+  },
+  "settings": {
+    "modItemXLExampleBlade": [1, 0],
+    "modItemXLThirdHit": [1, 1],
+    "modDescVanilla": [1, 2],
+    "modLinked": [1, 3]
+  },
+  "expect": {
+    "conflicts": 0,
+    "warnings": 0,
+    "errors": 0,
+    "contains": [
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "name=\"ItemXL Linked Blade\""],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "ItemXLThirdHit"],
+      ["dlc/dlcitemxl/data/gameplay/items_plus/itemxl.xml", "ItemXLThirdHit"],
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "localisation_key_description=\"itemxl_item_description_more_itemxl_example_blade\""],
+      ["gameplay/items/def_item_crafting_weapons.xml", "localisation_key_description=\"itemxl_item_description_more_novigraadan_sword_4_crafted\""]
+    ],
+    "texts": [
+      ["de", "Ein Schwert, nur aus einer YAML-Datei.<br><font color='#FF6060'>Jeder dritte Treffer verursacht doppelten Schaden.</font>"],
+      ["en", "A sword made from nothing but a YAML file.<br><font color='#FF6060'>Every third hit deals double damage.</font>"],
+      ["fr", "<br><font color='#FF6060'>Every third hit deals double damage.</font>"],
+      ["de", "Stahlschwert. Für den Kampf gegen Humanoide.<br>Zweite Zeile."],
+      ["pl", "<br>Second line."]
+    ]
+  }
+}

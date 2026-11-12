@@ -1,0 +1,57 @@
+{
+  "about": "A mod listed in mods.settings that replaces a whole definition file would win over ItemXL's output mod, and so would Script Merger's mod0000_MergedFiles with a merged definition file: the report says so. With the output mod listed before them, there is nothing to say (case order).",
+  "mods": {
+    "modWhole": {
+      "override": [
+        {
+          "file": "gameplay\\items\\def_item_bolts.xml",
+          "item": "Bodkin Bolt",
+          "attr": "price",
+          "value": "7"
+        }
+      ]
+    },
+    "modYaml": {
+      "own": "Mods/modYaml"
+    },
+    "mod0000_MergedFiles": {
+      "override": [
+        {
+          "file": "gameplay\\items\\def_item_bolts.xml",
+          "item": "Bodkin Bolt",
+          "attr": "price",
+          "value": "8"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "modWhole": [
+      1,
+      0
+    ],
+    "mod0000_MergedFiles": [
+      1,
+      1
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "errors": 0,
+    "warnings": 2,
+    "report_contains": [
+      "modWhole replaces gameplay/items/def_item_bolts.xml and is listed in mods.settings before mod00000_ItemXL",
+      "mod0000_MergedFiles replaces gameplay/items/def_item_bolts.xml and is listed in mods.settings before mod00000_ItemXL"
+    ],
+    "contains": [
+      [
+        "gameplay/items/def_item_bolts.xml",
+        "price=\"7\""
+      ],
+      [
+        "gameplay/items/def_item_bolts.xml",
+        "weight=\"0.05\""
+      ]
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "about": "Rules instead of names: $where (tags, name pattern, category, comparison), $if per record and document, $requires, $after",
+  "mods": {
+    "modBase": {"own": "Mods/modBase"},
+    "modRules": {"own": "Mods/modRules"},
+    "modNeeds": {"own": "Mods/modNeeds"},
+    "modEarly": {"own": "Mods/modEarly"},
+    "modLate": {"own": "Mods/modLate"}
+  },
+  "settings": {
+    "modBase": [1, 4],
+    "modRules": [1, 3],
+    "modNeeds": [1, 2],
+    "modEarly": [1, 0],
+    "modLate": [1, 1]
+  },
+  "expect": {
+    "conflicts": 1,
+    "errors": 1,
+    "errors_contain_cpp": ["modNeeds: itemxl/needs.yaml: needs modNotThere"],
+    "warnings": 0,
+    "report_contains": [
+      "[where]  modRules: item 'Every Aerondight': 2 record(s)",
+      "[if]     modRules: itemxl/rules.yaml: item 'Bait Bolt' skipped",
+      "[if]     modRules: itemxl/rules.yaml: skipped, its $if does not hold",
+      "[after]  modLate after modEarly"
+    ],
+    "contains": [
+      ["dlc/dlcitemxl/data/gameplay/items/itemxl.xml", "enhancement_slots=\"5\""],
+      ["gameplay/items/def_item_bolts.xml", "price=\"77\""],
+      ["gameplay/items/def_item_bolts.xml", "price=\"22\""]
+    ],
+    "absent": [
+      ["gameplay/items/def_item_bolts.xml", "price=\"999\""],
+      ["gameplay/items/def_item_bolts.xml", "price=\"555\""],
+      ["gameplay/items/def_item_bolts.xml", "price=\"444\""],
+      ["gameplay/items/def_item_bolts.xml", "price=\"11\""]
+    ]
+  }
+}

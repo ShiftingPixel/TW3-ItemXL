@@ -1,0 +1,14 @@
+item:
+  Bodkin Bolt:
+    price: 30                 # the extend copy sets price: it gets 30 as well
+    weight: 0.5               # the extend copy does not set weight: it stays without
+    tags:                     # tags are joined by the game: only the !remove goes to the extend copy
+      "!append": [YamlTag]
+      "!remove": [ExtendTag]
+    base_abilities:           # the extend copy's list replaces the game's: the whole change goes there too
+      "!append": [Default weapon _Stats]
+  Split Bolt:                 # extend copy in a DLC inside a mod's bundle (Mods\modBundleDlc)
+    price: 32
+  Cheap bolts:
+    $where: {name: Blunt Bolt}
+    price: 31

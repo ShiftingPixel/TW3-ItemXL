@@ -1,0 +1,7 @@
+# A copy of another mod's new item. This mod is applied first (it loses in the load order), so the item it copies
+# does not exist yet when its turn comes: the build makes that one first.
+$requires: [modItemXLExampleBlade]
+item:
+  ItemXL Linked Blade:
+    $base: ItemXL Example Blade
+    price: 123

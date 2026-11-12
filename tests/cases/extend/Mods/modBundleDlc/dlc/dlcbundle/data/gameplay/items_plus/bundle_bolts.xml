@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<redxml>
+<definitions>
+<items>
+	<item name="Split Bolt" on_conflict="extend" price="6" />
+</items>
+</definitions>
+</redxml>

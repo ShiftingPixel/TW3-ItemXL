@@ -1,0 +1,16 @@
+# Typos a validation has to catch (each is reported, the build still runs).
+ability:
+  ItemXL Typo Blade _Stats:
+    $base: Novigraadan sword 4_crafted _Stats
+    SlashingDamge: {type: base, min: 300}          # stat name misspelt
+item:
+  ItemXL Typo Blade:
+    $base: Novigraadan sword 4_crafted
+    prise: 400                                     # attribute misspelt
+    "sell price": 400                              # not a name XML allows: an error, the field is left out
+    base_abilities:
+      - !append ItemXL Typo Blade Stats            # ability that does not exist
+    $recipe:
+      crafter: Smyth                               # crafter misspelt
+      level: Master
+      ingredients: {Steel ingott: 2}               # ingredient misspelt

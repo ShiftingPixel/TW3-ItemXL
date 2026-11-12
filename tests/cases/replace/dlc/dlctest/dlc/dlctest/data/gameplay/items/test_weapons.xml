@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<redxml>
+<definitions>
+<items>
+	<item name="Olgierd Sabre" on_conflict="replace" category="steelsword" price="16" enhancement_slots="3" equip_template="olgierd_sabre" localisation_key_name="item_name_olgierd_sabre">
+		<tags>PlayerSteelWeapon, Weapon, sword1h</tags>
+	</item>
+</items>
+</definitions>
+</redxml>

@@ -1,0 +1,35 @@
+{
+  "about": "Misspelt names in a YAML delta are reported (like TweakXL's log); the build still runs",
+  "mods": {
+    "modTypos": {
+      "own": "Mods/modTypos"
+    }
+  },
+  "settings": {
+    "modTypos": [
+      1,
+      0
+    ]
+  },
+  "expect": {
+    "conflicts": 0,
+    "warnings": 5,
+    "warnings_contain": [
+      "modTypos: ability 'ItemXL Typo Blade _Stats': unknown stat 'SlashingDamge'",
+      "modTypos: item 'ItemXL Typo Blade': unknown attribute 'prise'",
+      "modTypos: item 'ItemXL Typo Blade': base ability 'ItemXL Typo Blade Stats' does not exist",
+      "modTypos: schematic 'ItemXL Typo Blade schematic': craftsmanType_name 'Smyth' is not one of Armorer, Crafter, Smith",
+      "modTypos: schematic 'ItemXL Typo Blade schematic': ingredient 'Steel ingott' does not exist"
+    ],
+    "errors": 1,
+    "errors_contain_cpp": [
+      "'sell price' is not a valid attribute or element name"
+    ],
+    "absent": [
+      [
+        "dlc/dlcitemxl/data/gameplay/items/itemxl.xml",
+        "sell price"
+      ]
+    ]
+  }
+}

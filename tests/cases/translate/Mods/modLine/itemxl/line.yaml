@@ -1,0 +1,4 @@
+item:
+  Bodkin Bolt:
+    $text:
+      description: !append {en: "Extra line for tests.", de: "Alte Zeile."}

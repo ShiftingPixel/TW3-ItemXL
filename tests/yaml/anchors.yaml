@@ -1,0 +1,25 @@
+# anchors, aliases and merge keys: the C++ reader has to give what PyYAML gives
+common: &common
+  price: 100
+  weight: 2.5
+  tags: !append [A, B]
+item:
+  First:
+    <<: *common
+    price: 200
+  Second:
+    <<: *common
+  Third: *common
+  Fourth:
+    <<: [*common, {weight: 9, extra: x}]
+    own: 1
+  Flow: {<<: *common, price: 5}
+  Tagged: &tagged !append-once [C]
+  Again: *tagged
+  Listed:
+    - &one first
+    - *one
+  Inline: {a: &two 2, b: *two}
+  From:
+    tags: !append-from Other Item
+    base_abilities: !prepend-from [A _Stats, B _Stats]
