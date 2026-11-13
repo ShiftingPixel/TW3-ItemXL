@@ -4,6 +4,11 @@ ability:
     $base: Novigraadan sword 4_crafted _Stats
     SlashingDamge: {type: base, min: 300}          # stat name misspelt
 item:
+  ItemXL Typo Scabbard:                             # hidden (NoShow): needs no icon or name, no warning
+    $base: scabbard_steel_2_01
+  ItemXL Typo Shown Scabbard:                       # shown: the missing icon and name are reported
+    $base: scabbard_steel_2_01
+    tags: [NoDrop]
   ItemXL Typo Blade:
     $base: Novigraadan sword 4_crafted
     prise: 400                                     # attribute misspelt

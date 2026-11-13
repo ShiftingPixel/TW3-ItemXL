@@ -13,13 +13,14 @@
   },
   "expect": {
     "conflicts": 0,
-    "warnings": 5,
+    "warnings": 6,
     "warnings_contain": [
       "modTypos: ability 'ItemXL Typo Blade _Stats': unknown stat 'SlashingDamge'",
       "modTypos: item 'ItemXL Typo Blade': unknown attribute 'prise'",
       "modTypos: item 'ItemXL Typo Blade': base ability 'ItemXL Typo Blade Stats' does not exist",
       "modTypos: schematic 'ItemXL Typo Blade schematic': craftsmanType_name 'Smyth' is not one of Armorer, Crafter, Smith",
-      "modTypos: schematic 'ItemXL Typo Blade schematic': ingredient 'Steel ingott' does not exist"
+      "modTypos: schematic 'ItemXL Typo Blade schematic': ingredient 'Steel ingott' does not exist",
+      "new item 'ItemXL Typo Shown Scabbard' has no icon_path, localisation_key_name"
     ],
     "errors": 1,
     "errors_contain_cpp": [

@@ -6,7 +6,7 @@ Every build writes `<game>\Mods\mod00000_ItemXL\itemxl_report.txt`. It starts wi
 needs attention.
 
 ```
-ItemXL 1.0.0 build 2026-11-12 12:00:00  (1.5s)
+ItemXL 1.0.1 build 2026-11-12 12:00:00  (1.5s)
 TW3SE 1.3.3 (interface 25), game build 6adfbd7a
 
 [import] modSomeOldMod: 12 records from whole-file overrides

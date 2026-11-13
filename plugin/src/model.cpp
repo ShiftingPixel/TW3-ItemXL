@@ -591,7 +591,20 @@ std::vector<std::string> check_new_items(Index& index) {
     records_of(*it->second, [&](Node*, Node* el) {
         if (el->tag != "item") return;
         std::vector<std::string> missing;
-        for (auto* a : NEEDS) { auto* v = el->attr(a); if (!v || v->empty()) missing.push_back(a); }
+        // an item with the tag NoShow is never shown (scabbards and other technical items): it needs no icon or name
+        bool hidden = false;
+        if (Node* t = el->find("tags")) {
+            std::string tag;
+            for (char c : t->text + ",") {
+                if (c == ',') { hidden |= tag == "NoShow"; tag.clear(); }
+                else if (!std::isspace((unsigned char)c)) tag += c;
+            }
+        }
+        for (auto* a : NEEDS) {
+            if (hidden && std::string(a) != "category") continue;
+            auto* v = el->attr(a);
+            if (!v || v->empty()) missing.push_back(a);
+        }
         auto* cat = el->attr("category");
         bool equipped = false;
         for (auto* c : EQUIPPED) equipped |= cat && *cat == c;

@@ -61,7 +61,8 @@ can do that to the same class at once. Use them whenever possible:
 | `@replaceMethod(Class)` | replaces an existing function; only one mod can do that per function, so prefer `@wrapMethod` |
 
 Since the Remastered patch (5.0), events and states can be annotated as well, and native functions can be wrapped. A
-wrapped `event` has no return type in its declaration (it always returns `bool`). States are annotated with the
+wrapped event is declared with `function`, not `event`, and without a return type; `return wrappedMethod(...)` passes
+on the event's result (`@wrapMethod(CR4Player) function OnHolsteredItem(category : name, slotName : name)`). States are annotated with the
 state's class name, `<Parent>State<Name>`, for example `@wrapMethod(WeaponHolsterStateSelectingWeapon)`.
 
 ## Item names in scripts

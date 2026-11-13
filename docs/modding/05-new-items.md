@@ -267,6 +267,7 @@ Your changes go to both copies.
 ## Checks for new items
 
 The report warns when a new item lacks something the game needs: a category, a name text, an icon, or a look
-(`equip_template`) for things that can be worn or held. A `$base` copy has all of them already.
+(`equip_template`) for things that can be worn or held. A `$base` copy has all of them already. Items with the tag
+`NoShow` never appear in the inventory (scabbards and other technical items), so they need no icon or name text.
 
 Next: [Rules](06-rules.md).
