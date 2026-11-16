@@ -914,6 +914,23 @@ BuildResult build(const BuildOptions& opt) {
         own_dlc |= starts_with(lower(kv.first), lower(ITEMXL_DLC_ROOT) + "\\");
     }
     if (own_dlc) out_files[ITEMXL_REDDLC_PATH] = itemxl_reddlc(look.templates);   // mounts ItemXL's DLC folders
+    // A bundle entry holds an ASCII path below 256 characters, and the game finds a file by its lower-case path:
+    // a longer or non-ASCII path, or two paths that differ only in case, would be packed but never found.
+    {
+        std::set<std::string> seen;
+        for (auto it = out_files.begin(); it != out_files.end();) {
+            const std::string& p = it->first;
+            bool ascii = std::all_of(p.begin(), p.end(), [](char c) { return (unsigned char)c < 0x80; });
+            std::string why = p.size() >= 0x100 ? "its path has 256 characters or more"
+                            : !ascii            ? "its path has characters outside ASCII"
+                            : !seen.insert(lower(p)).second ? "another file has the same path in other letter case"
+                            : "";
+            if (why.empty()) { ++it; continue; }
+            warn.push_back("file " + p + " is not packed: " + why);
+            yaml_warnings++;
+            it = out_files.erase(it);
+        }
+    }
 
     // Stage the output into a temporary folder and swap it in at the end, so a failed or interrupted build does not
     // leave a half-written mod folder behind.

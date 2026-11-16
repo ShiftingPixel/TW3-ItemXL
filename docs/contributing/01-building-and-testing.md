@@ -9,8 +9,10 @@
   python -m pip install --user ziglang pyyaml jsonschema
   ```
 
-- The TW3SE SDK, unpacked into `third_party\TW3SE-SDK` (not part of this repository; download it with TW3SE). Only
-  the plugin needs its header; the tests use its CR2W and texture tools.
+- The TW3SE SDK, unpacked into `third_party\TW3SE-SDK` (not part of this repository; download it with TW3SE). The
+  source of the [TW3SE repository](https://github.com/MaximdeWinter/TW3SE) works as well: it has the same `include`
+  and `tools` folders. Only the plugin needs its header (`include\tw3se\tw3se.h`); the tests use its CR2W and texture
+  tools (`tools`).
 - An installed Witcher 3 for the tests. The tests look for it in the Steam and GOG install locations. If yours is
   elsewhere, set the environment variable `ITEMXL_GAME` to the game folder, or create a file `local_paths.json` in
   the repository root with this content:

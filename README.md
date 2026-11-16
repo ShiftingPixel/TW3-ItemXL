@@ -14,7 +14,7 @@ Download the compiled ItemXL plugin from [Nexus Mods](https://www.nexusmods.com/
 
 To get the source code, open this GitHub repository's **Code** menu and choose **Download ZIP**. Extract the source, then follow [Building and testing](docs/contributing/01-building-and-testing.md) to install the build requirements and compile ItemXL with `plugin\build.bat`.
 
-The source ZIP does not contain the compiled plugin or the TW3SE SDK. The SDK folder must be placed in `third_party\TW3SE-SDK` before building. You do not need Git to download or build the source this way.
+The source ZIP does not contain the compiled plugin or the TW3SE SDK. The SDK must be placed in `third_party\TW3SE-SDK` before building: either the SDK that comes with TW3SE, or the source of the [TW3SE repository](https://github.com/MaximdeWinter/TW3SE), which has the same `include` and `tools` folders. You do not need Git to download or build the source this way.
 
 ## What ItemXL does
 
@@ -72,4 +72,4 @@ automated tests and by hand in the game.
 
 ItemXL was inspired by [TweakXL](https://github.com/psiberx/cp2077-tweak-xl) and [ArchiveXL](https://github.com/psiberx/cp2077-archive-xl), two modding frameworks for Cyberpunk 2077.
 
-Thanks to [MaximDeWinter](https://www.nexusmods.com/profile/MaximDeWinter) for creating and maintaining the Witcher 3 Script Extender.
+Thanks to [MaximDeWinter](https://www.nexusmods.com/profile/MaximDeWinter) for creating and maintaining the [Witcher 3 Script Extender](https://github.com/MaximdeWinter/TW3SE).
