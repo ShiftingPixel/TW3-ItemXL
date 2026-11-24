@@ -1,0 +1,18 @@
+{
+  "about": "A Lua mod made an item and an ability through TW3SE (w3.items, written to TW3SE's tw3se_items.xml) with the names of ItemXL's new item and ability: the report warns about each name once. Names only TW3SE makes are no warning.",
+  "mods": {
+    "modItemXLExampleBlade": {
+      "project": "examples/modItemXLExampleBlade"
+    }
+  },
+  "tw3se_items": "tw3se_items.xml",
+  "expect": {
+    "conflicts": 0,
+    "errors": 0,
+    "warnings": 2,
+    "warnings_contain": [
+      "item 'ItemXL Example Blade' is made by ItemXL and by a TW3SE Lua mod (w3.items): rename one of them",
+      "ability 'ItemXL Example Blade _Stats' is made by ItemXL and by a TW3SE Lua mod (w3.items): rename one of them"
+    ]
+  }
+}

@@ -42,13 +42,35 @@ stamp ─▶ game files ─▶ mods ─▶ rules ─▶ new records ─▶ chang
    written into `<output>.tmp` first and copied into the output file by file; stale files of older builds are removed
    only after that succeeded.
 
+Listing the mod folders, reading and unpacking the game's definition files, parsing them and loading the texts of
+all languages run on several threads (`parallel_for`, at most 8). Each thread fills only its own slot; the results
+are taken in the same order as before, so the output stays the same byte for byte.
+
+## Changes while the game runs
+
+With TW3SE 1.4.0 or later the plugin starts a thread at the lowest Windows priority (background mode) after the
+start's build. It must never be felt in the game, so it lists no folder: it asks once a second for the size and
+date of exactly the YAML files the start's build read (`BuildResult::yaml_files`). A new YAML file or mod is seen at
+the next start or with `/itemxl reload`, which lists the folders once.
+
+When a file changed and stayed the same for a second, the thread runs `build()` with `live` set: the same build on
+one thread, nothing written but the report and the text files, the stamp left old so the next start builds as
+usual. `live_delta` (`live.cpp`) compares its output with the one the game loaded (the output's `blob0.bundle`, later
+the last live result) and keeps only new and changed records, under their element path; a record the game already
+has gets `on_conflict="replace"`. New Game Plus files (`items_plus`) go into a second XML.
+
+The main thread then runs a short Lua chunk through TW3SE: `w3.files.set` puts each XML into the depot as a new file
+under `gameplay\items\`, `w3.items.mount` loads the normal one, and in a New Game Plus game a
+`CR4DefinitionsNGPlusDLCMounter` loads the other. Earlier mounts stay: unmounting would take their records out of the
+game. Afterwards the plugin shows a notice, logs the records and sends them on the channel `itemxl.live`.
+
 ## Plugin and command-line tool
 
 | | `ItemXL.dll` | `itemxl-cli.exe` |
 |---|---|---|
 | entry | `plugin.cpp` | `cli.cpp` |
-| build | at game start | `itemxl-cli build` |
-| extra | console command, log through TW3SE | `show`, `search`, `new`, `schema` (`browse.cpp`), format helpers for tests |
+| build | at game start, and again while the game runs | `itemxl-cli build`, `itemxl-cli build --live` |
+| extra | console command, log through TW3SE, live changes | `show`, `search`, `new`, `schema` (`browse.cpp`), format helpers for tests |
 
 Only `plugin.cpp` includes the TW3SE header. Everything else builds without the SDK.
 

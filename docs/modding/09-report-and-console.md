@@ -6,8 +6,8 @@ Every build writes `<game>\Mods\mod00000_ItemXL\itemxl_report.txt`. It starts wi
 needs attention.
 
 ```
-ItemXL 1.0.1 build 2026-11-12 12:00:00  (1.5s)
-TW3SE 1.3.3 (interface 25), game build 6adfbd7a
+ItemXL 1.1.0 build 2026-11-24 12:00:00  (0.7s)
+TW3SE 1.4.2 (interface 29), game build 6adfbd7a
 
 [import] modSomeOldMod: 12 records from whole-file overrides
 [delta]  modMyMod: itemxl\my_mod.yaml (4 records)
@@ -66,10 +66,13 @@ What each section means:
 
 ## Notices in the game
 
-About two seconds after a save is loaded, ItemXL shows a notice when:
+ItemXL shows these notices in the game, in English:
 
-- the last build had errors or YAML warnings, with their numbers;
-- the save holds items the game no longer knows, because a mod was removed or an item renamed.
+| Notice | When |
+|---|---|
+| `ItemXL: Items in this save no longer exist: <items>` | about two seconds after a save is loaded, when it holds items the game no longer knows (a mod was removed or an item renamed) |
+| `ItemXL: Changes from <mods> could not be applied. See itemxl_report.txt` | about two seconds after a save is loaded, when the last build had errors; once per build and save. Warnings only go to the report |
+| `ItemXL: <name> updated` or `ItemXL: <n> entries updated` | when a change was loaded while the game runs (see below) |
 
 ## The TW3SE console
 
@@ -82,7 +85,51 @@ command:
 | `/itemxl version` | ItemXL and TW3SE versions |
 | `/itemxl report` | the report from `CONFLICTS` on |
 | `/itemxl show <name>` | a record as the game reads it now, every copy with its file (takes a few seconds) |
+| `/itemxl reload` | build now and load what changed into the running game |
+| `/itemxl live off` | stop watching for changes until the next start (`/itemxl live on` turns it on again) |
 
 The game's own debug console (`~`) is a different console; ItemXL's commands are not available there.
+
+## Changes while the game runs
+
+With TW3SE 1.4.0 or later, ItemXL watches the mods' YAML files while the game runs. Save one, and about two
+seconds later the changed records are in the game: ItemXL builds in the background, compares the result with what
+the game loaded at the start, and loads only the records that differ. The game shows "ItemXL: ItemXL Example
+Blade updated", or "ItemXL: 3 entries updated" when more changed; the TW3SE log names the records, and the report is
+written again.
+
+The watching is built so that it is never felt in the game, with any number of mods. It lists no folder while the
+game runs: it watches exactly the YAML files that were there at the start and asks once a second for the size and
+date of each, in a background thread of the lowest priority. A new YAML file or a new mod is seen at the next start
+or with `/itemxl reload`, which looks through the folders once. Should a look ever take longer than 100 ms, the
+watching stops for the session and the TW3SE log says so; `/itemxl reload` still works then.
+
+Some changes wait for the next start, and the TW3SE log says so:
+
+- items already in an inventory may keep what they had; to be sure, look at a new one (for example from
+  `w3.inv.add`). Rune slots, for example, follow the game's own rule even after a restart: an item keeps the slots
+  it was made with, so more slots reach every item, fewer only new ones
+- records that were removed, appearances, models, textures and icons
+- New Game Plus definitions (`items_plus`) change live only in a New Game Plus game; in another game they are left
+  out, they are not needed there
+- names and descriptions (`$text`) are written at once; whether TW3SE shows them before the next start is not
+  certain
+
+The next start builds the output again as usual, with all changes in it.
+
+### For other mods
+
+After each live change ItemXL sends a message on the TW3SE channel `itemxl.live`, one line per changed record:
+the tag, a tab, the name. A Lua mod that keeps its own state about items can react to it:
+
+```lua
+w3.on_message("itemxl.live", function(text)
+  for tag, name in text:gmatch("([^\t\n]+)\t([^\n]+)") do
+    print("ItemXL changed " .. tag .. " " .. name)
+  end
+end)
+```
+
+C++ plugins listen with `RegisterOnMessage`, scripts with `TW3SE_Receive("itemxl.live")`.
 
 Next: [Command-line tool](10-cli.md).

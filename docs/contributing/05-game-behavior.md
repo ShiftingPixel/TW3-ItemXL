@@ -21,6 +21,8 @@ again; passing tests are not enough.
 | A DLC copy with `on_conflict="replace"` replaces the record | changes go to it as well (`targets`) |
 | A DLC copy with `on_conflict="extend"` lays its attributes and elements over the record; **tags are joined, `base_abilities` replace the record's** (tested with a DLC copy of `Bodkin Bolt`) | `apply_extends`: fields the copy sets get the change; for tags only `!remove` and new lists, for `base_abilities` all of it; other lists are reported |
 | A copy without `on_conflict` only adds (merchant goods, extra loot) | such fragments are left alone, otherwise entries would be doubled |
+| A definitions XML mounted while the game runs (TW3SE `w3.items.mount`) with a copy of an ItemXL record and `on_conflict="replace"` changes the record at once (tested with `enhancement_slots` of a new sword) | live changes mount only the changed records (`live.cpp`); earlier mounts stay |
+| An item shows the larger of its own `enhancement_slots` (kept from when it was made) and the definition's: more slots reach every item, fewer only new ones (observed, not tested on purpose) | nothing to do; documented for authors |
 
 ## Appearance
 

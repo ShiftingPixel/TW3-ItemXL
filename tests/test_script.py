@@ -55,8 +55,11 @@ def run():
         if f"item '{n}' was made by the last build and is gone now" not in rep:
             problems.append(f"the report does not say that '{n}' is gone")
     ws2 = open(ws_path, encoding="utf-8").read()
-    if "1 error(s)" not in ws2 or "1 Fehler" not in ws2:
-        problems.append("itemxl.ws does not carry the build error")
+    if "ItemXL: Changes from modBroken could not be applied. See itemxl_report.txt" not in ws2:
+        problems.append("itemxl.ws does not name the mod whose changes failed")
+    for word in ("Fehler", "Spielstand", "GetCurrentLocale"):   # English only
+        if word in ws2:
+            problems.append(f"itemxl.ws still has a translation ({word})")
     if ws2.split("ItemXL_BuildId() : string { return ")[1][:18] == ws.split("ItemXL_BuildId() : string { return ")[1][:18]:
         problems.append("the build id did not change")
     return problems

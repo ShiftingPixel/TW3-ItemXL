@@ -17,7 +17,7 @@ Start here if you want to build mods with ItemXL. The pages build on each other;
 | [Rules](modding/06-rules.md) | `$where`, `$if`, `$requires`, `$after` |
 | [Appearance](modding/07-appearance.md) | Own models, textures, templates, dyes, and icons |
 | [Load order and compatibility](modding/08-load-order-and-compatibility.md) | Conflicts, whole-file mods, XML override, script mods |
-| [Report and console](modding/09-report-and-console.md) | Reading the report, notices in the game, console commands |
+| [Report and console](modding/09-report-and-console.md) | Reading the report, notices in the game, console commands, changes while the game runs |
 | [Command-line tool](modding/10-cli.md) | `itemxl-cli`: look up records, start a YAML file, check a mod |
 | [VS Code](modding/11-vscode.md) | Completion and checks while you type |
 | [Scripts](modding/12-scripts.md) | Using ItemXL items from WitcherScript |

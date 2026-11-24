@@ -53,7 +53,17 @@ itemxl-cli build --mods "C:\path\to\Mods" --out "C:\path\to\test-output" --force
 
 The same build the game does at start, into a folder of your choice. Use it to check a mod without starting the
 game: the report is in the output folder. `--settings` points to a `mods.settings`, `--force` builds even when
-nothing changed.
+nothing changed. `--tw3se-items` points to TW3SE's `tw3se_items.xml` to check names against TW3SE Lua mods (the
+game does this on its own).
+
+```powershell
+itemxl-cli build --mods "C:\path\to\Mods" --out "C:\path\to\test-output" --live "C:\path\to\mod00000_ItemXL\content\blob0.bundle" --delta changes.xml --delta-plus changes_plus.xml
+```
+
+`--live` makes the build the game makes while it runs: it writes nothing but the report and the text files, and
+compares its result with the output given (the one the game loaded). It prints the records that changed and what
+waits for the next start; `--delta` and `--delta-plus` write the XML files ItemXL would load into the game, for the
+normal game and for New Game Plus.
 
 ## import
 

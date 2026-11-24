@@ -17,7 +17,43 @@ class Op:
 
 
 class Loader(yaml.SafeLoader):
-    pass
+    def flatten_mapping(self, node):
+        """Merge keys as the YAML merge spec (and PyYAML up to 6.0.3) has them: of `<<: [a, b]` the earlier mapping
+        wins, the mapping's own keys win over all. PyYAML 6.0.4 drops a repeated key only when both key strings are
+        the same Python object, so there a later mapping in the list can win by chance (seen with `weight`)."""
+        merge = []
+        index = 0
+        while index < len(node.value):
+            key_node, value_node = node.value[index]
+            if key_node.tag == "tag:yaml.org,2002:merge":
+                del node.value[index]
+                if isinstance(value_node, yaml.MappingNode):
+                    self.flatten_mapping(value_node)
+                    merge.extend(value_node.value)
+                elif isinstance(value_node, yaml.SequenceNode):
+                    submerge = []
+                    for subnode in value_node.value:
+                        if not isinstance(subnode, yaml.MappingNode):
+                            raise yaml.constructor.ConstructorError(
+                                "while constructing a mapping", node.start_mark,
+                                f"expected a mapping for merging, but found {subnode.id}", subnode.start_mark)
+                        self.flatten_mapping(subnode)
+                        submerge.append(subnode.value)
+                    submerge.reverse()           # later pairs win when the mapping is built: the first list entry last
+                    for value in submerge:
+                        merge.extend(value)
+                else:
+                    raise yaml.constructor.ConstructorError(
+                        "while constructing a mapping", node.start_mark,
+                        f"expected a mapping or list of mappings for merging, but found {value_node.id}",
+                        value_node.start_mark)
+            elif key_node.tag == "tag:yaml.org,2002:value":
+                key_node.tag = "tag:yaml.org,2002:str"
+                index += 1
+            else:
+                index += 1
+        if merge:
+            node.value = merge + node.value
 
 
 def _make(op):

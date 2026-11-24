@@ -141,6 +141,8 @@ def run_case(path: str) -> None:
             "--out", cpp, "--force"]
     if dlc:
         args += ["--dlc", dlc]
+    if case.get("tw3se_items"):                      # TW3SE's own items (w3.items), a file of the case
+        args += ["--tw3se-items", os.path.join(case_dir, case["tw3se_items"])]
     r = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="replace")
     rep_path = os.path.join(cpp, "itemxl_report.txt")
     rep = open(rep_path, encoding="utf-8").read() if os.path.isfile(rep_path) else ""
@@ -249,6 +251,58 @@ def output() -> None:
     step("output", problems, "rebuild in place, stale files removed, unchanged inputs kept")
 
 
+def live() -> None:
+    """Live changes: the examples case built as at the start, then one price changed in a copy of its mods. The live
+    build (--live) writes nothing but the report and texts, and its delta holds just that record, with
+    on_conflict="replace" because the game already has it; its New Game Plus copy goes into the second XML; a delta
+    against itself holds nothing."""
+    w = os.path.join(WORK, "examples")
+    out = os.path.join(w, "out")
+    bundle = os.path.join(out, "content", "blob0.bundle")
+    if not os.path.isfile(bundle):
+        step("live", ["the examples case did not run"])
+        return
+    lw = os.path.join(WORK, "live")
+    rmtree(lw)
+    shutil.copytree(os.path.join(w, "Mods"), os.path.join(lw, "Mods"))
+    y = os.path.join(lw, "Mods", "modItemXLExampleBlade", "itemxl", "example_blade.yaml")
+    text = open(y, encoding="utf-8").read()
+    open(y, "w", encoding="utf-8").write(text.replace("    price: 400", "    price: 777", 1))
+    problems = []
+
+    def run(mods: str, delta: str) -> str:
+        args = [paths.CLI, "build", "--game", paths.GAME, "--mods", mods, "--settings", os.path.join(w, "mods.settings"),
+                "--out", os.path.join(lw, "out"), "--live", bundle, "--delta", delta,
+                "--delta-plus", delta + ".plus"]
+        r = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if r.returncode:
+            problems.append(f"live build failed: {r.stderr[-500:]}")
+        return r.stdout
+
+    def xml_of(p: str) -> str:
+        return open(p, encoding="utf-8").read() if os.path.isfile(p) else ""
+
+    delta = os.path.join(lw, "delta.xml")
+    got = run(os.path.join(lw, "Mods"), delta)
+    lines = got.splitlines()
+    if "records: 1" not in lines or "item 'ItemXL Example Blade'" not in got:
+        problems.append(f"expected one changed record, got: {got[:500]}")
+    if "New Game Plus records: 1" not in lines:
+        problems.append(f"expected one changed New Game Plus record, got: {got[:500]}")
+    plus = open(delta + ".plus", encoding="utf-8").read() if os.path.isfile(delta + ".plus") else ""
+    if 'price="777"' not in plus or 'price="777"' not in xml_of(delta):
+        problems.append("the normal or the New Game Plus delta lacks the new price")
+    xml = open(delta, encoding="utf-8").read() if os.path.isfile(delta) else ""
+    if 'price="777"' not in xml or 'on_conflict="replace"' not in xml:
+        problems.append("the delta lacks the new price or on_conflict=\"replace\"")
+    if os.path.exists(os.path.join(lw, "out", "content")) or os.path.exists(os.path.join(lw, "out", "itemxl.stamp")):
+        problems.append("a live build wrote the game's files or the stamp")
+    same = run(os.path.join(w, "Mods"), os.path.join(lw, "same.xml"))
+    if "records: 0" not in same.splitlines() or "New Game Plus records: 0" not in same.splitlines():
+        problems.append(f"a delta against the same build is not empty: {same[:300]}")
+    step("live", problems, "live build: one changed record, replace, nothing written")
+
+
 def main() -> int:
     t0 = time.time()
     if "--build" in sys.argv:
@@ -266,6 +320,7 @@ def main() -> int:
     for c in sorted(glob.glob(os.path.join(HERE, "cases", "*.json"))):
         run_case(c)
     output()
+    live()
     roundtrip()
     bad = sum(1 for _n, p, _x in results if p)
     print(f"\n{len(results) - bad} of {len(results)} steps ok ({time.time() - t0:.0f}s)")

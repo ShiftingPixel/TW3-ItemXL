@@ -105,7 +105,7 @@ std::vector<Found> scan_files(const std::string& dir, const char* ext, bool recu
     std::sort(out.begin(), out.end(), [](const Found& a, const Found& b) { return a.path < b.path; });
     return out;
 }
-struct ModScan { std::vector<Found> bundles, xl; };   // the bundles in content, everything below itemxl
+struct ModScan { std::vector<Found> bundles, xl, texts; };   // the bundles and texts in content, all below itemxl
 
 std::string text_of(const Bytes& b) { return std::string(b.begin(), b.end()); }
 
@@ -232,34 +232,40 @@ BuildResult build(const BuildOptions& opt) {
     // a new build of ItemXL itself (a fix in how files are read, a change to its script) rebuilds once, even without
     // a new version number
     stamp += "built " + own_binary_stamp() + "\n";
-    stamp += "script " + std::to_string(fnv1a64(itemxl_script("", 0, 0))) + "\n";
+    stamp += "script " + std::to_string(fnv1a64(itemxl_script("", {}))) + "\n";
     if (!opt.environment.empty()) stamp += opt.environment + "\n";
     Bytes msb;
     if (read_file(opt.mods_settings, msb)) stamp += "mods.settings " + std::to_string(fnv1a64(text_of(msb))) + "\n";
     for (auto& b : vanilla_bundles) stamp_add(stamp, b);
     lap("game-stat");
     std::map<std::string, ModScan> scans;                // each mod folder is listed once
-    double t_content = 0, t_xl = 0;
-    for (auto& m : mods) {
-        stamp += "mod " + m + "\n";
-        ModScan& sc = scans[m];
+    double t_scan = 0;
+    {
+        // the folders are listed on several threads (at the start most of the time goes here with a big list),
+        // the stamp is written in the mods' order afterwards
+        std::vector<ModScan> listed(mods.size());
         auto a = std::chrono::steady_clock::now();
-        // the bundles, and the mod's own texts (<lang>.w3strings): `!append` to a text reads them
-        for (auto& f : scan_files(opt.mods_dir + "\\" + m + "\\content", "", false)) {
-            std::string l = lower(f.path);
-            if (ends_with(l, ".bundle")) sc.bundles.push_back(f);
-            else if (ends_with(l, ".w3strings"))
-                stamp += f.path + "|" + std::to_string(f.size) + "|" + std::to_string(f.time) + "\n";
+        parallel_for(mods.size(), [&](size_t i) {
+            ModScan& sc = listed[i];
+            // the bundles, and the mod's own texts (<lang>.w3strings): `!append` to a text reads them
+            for (auto& f : scan_files(opt.mods_dir + "\\" + mods[i] + "\\content", "", false)) {
+                std::string l = lower(f.path);
+                if (ends_with(l, ".bundle")) sc.bundles.push_back(f);
+                else if (ends_with(l, ".w3strings")) sc.texts.push_back(f);
+            }
+            sc.xl = scan_files(opt.mods_dir + "\\" + mods[i] + "\\itemxl", "", true);   // the YAMLs and own files
+        }, opt.live ? 1 : build_threads());
+        t_scan = std::chrono::duration<double>(std::chrono::steady_clock::now() - a).count();
+        for (size_t i = 0; i < mods.size(); i++) {
+            stamp += "mod " + mods[i] + "\n";
+            ModScan& sc = scans[mods[i]] = std::move(listed[i]);
+            for (auto* list : {&sc.texts, &sc.bundles, &sc.xl})
+                for (auto& f : *list)
+                    stamp += f.path + "|" + std::to_string(f.size) + "|" + std::to_string(f.time) + "\n";
         }
-        auto b2 = std::chrono::steady_clock::now();
-        sc.xl = scan_files(opt.mods_dir + "\\" + m + "\\itemxl", "", true);   // the YAMLs and the own files
-        t_content += std::chrono::duration<double>(b2 - a).count();
-        t_xl += std::chrono::duration<double>(std::chrono::steady_clock::now() - b2).count();
-        for (auto* list : {&sc.bundles, &sc.xl})
-            for (auto& f : *list)
-                stamp += f.path + "|" + std::to_string(f.size) + "|" + std::to_string(f.time) + "\n";
     }
     for (auto& y : global_yaml) stamp_add(stamp, y);
+    if (!opt.tw3se_items.empty()) stamp_add(stamp, opt.tw3se_items);
     // Script Merger's output is no input (ItemXL merges the original mods itself), but a definition file merged
     // there can win over ItemXL's result: its bundles are looked at for the warning below
     std::vector<Found> merged_bundles;
@@ -271,9 +277,16 @@ BuildResult build(const BuildOptions& opt) {
             }
     {
         char b[96];
-        std::snprintf(b, sizeof b, "%zu mods: content %.2f itemxl %.2f  ", mods.size(), t_content, t_xl);
+        std::snprintf(b, sizeof b, "%zu mods: listed %.2f  ", mods.size(), t_scan);
         laps += b;
     }
+    // the YAML files this build read: the plugin watches them while the game runs, without listing any folder
+    for (auto& m : mods)
+        for (auto& f : scans[m].xl) {
+            std::string l = lower(f.path);
+            if (ends_with(l, ".yaml") || ends_with(l, ".yml")) res.yaml_files.push_back(f.path);
+        }
+    for (auto& y : global_yaml) res.yaml_files.push_back(y);
     std::string stamp_path = opt.out_mod + "\\itemxl.stamp";
     Bytes old_stamp;
     lap("stamp");
@@ -289,13 +302,25 @@ BuildResult build(const BuildOptions& opt) {
     std::set<std::string> mod_dlc_files;                       // definition files of DLCs inside mods' bundles
     std::map<std::string, RawFile> raw;
     std::vector<std::vector<BundleEntry>> vanilla_entries;   // kept: $appearance looks through them again
-    for (size_t bi = 0; bi < vanilla_bundles.size(); bi++) {
+    // The definition files are read and unpacked on several threads (a live build in the game: on its own, low
+    // priority thread only); what follows takes them in the same order as before, so the result is the same.
+    const unsigned threads = opt.live ? 1 : build_threads();
+    struct Job { size_t bi; const BundleEntry* e; Bytes data; bool ok = false; };
+    std::vector<Job> jobs;
+    vanilla_entries.resize(vanilla_bundles.size());
+    parallel_for(vanilla_bundles.size(), [&](size_t bi) { vanilla_entries[bi] = bundle_entries(vanilla_bundles[bi]); },
+                 threads);
+    for (size_t bi = 0; bi < vanilla_entries.size(); bi++)
+        for (auto& e : vanilla_entries[bi])
+            if (is_definition_xml(e.name)) jobs.push_back(Job{bi, &e, {}, false});
+    parallel_for(jobs.size(), [&](size_t i) { jobs[i].ok = bundle_read(*jobs[i].e, jobs[i].data); }, threads);
+    for (auto& j : jobs) {
+        size_t bi = j.bi;
+        const BundleEntry& e = *j.e;
         const std::string& b = vanilla_bundles[bi];
-        vanilla_entries.push_back(bundle_entries(b));
-        for (auto& e : vanilla_entries.back()) {
-            if (!is_definition_xml(e.name)) continue;
-            Bytes data;
-            if (!bundle_read(e, data)) { note_file(e.name, e.name + ": cannot read from " + b); continue; }
+        {
+            Bytes data = std::move(j.data);
+            if (!j.ok) { note_file(e.name, e.name + ": cannot read from " + b); continue; }
             if (!is_definition_data(e.name, data)) continue;
             std::string key = lower(e.name);
             auto it = raw.find(key);
@@ -324,10 +349,19 @@ BuildResult build(const BuildOptions& opt) {
     lap("read");
     auto parse_set = [&](std::vector<std::unique_ptr<DefFile>>& store, std::map<std::string, DefFile*>& files,
                          bool note) {
-        for (auto& kv : raw) {
-            std::string err;
-            int dropped = 0;
-            auto root = xml_parse(text_of(kv.second.data), err, &dropped);
+        // parsed on several threads, then taken in the map's order as before
+        struct Parsed { const std::pair<const std::string, RawFile>* kv; std::unique_ptr<Node> root; std::string err;
+                        int dropped = 0; };
+        std::vector<Parsed> parsed;
+        for (auto& kv : raw) parsed.push_back(Parsed{&kv, nullptr, "", 0});
+        parallel_for(parsed.size(), [&](size_t i) {
+            parsed[i].root = xml_parse(text_of(parsed[i].kv->second.data), parsed[i].err, &parsed[i].dropped);
+        }, threads);
+        for (auto& p : parsed) {
+            auto& kv = *p.kv;
+            std::string err = p.err;
+            int dropped = p.dropped;
+            auto root = std::move(p.root);
             if (!root) {
                 if (note) note_file(kv.second.path, kv.second.path + ": not parsed (" + err + ")");
                 continue;
@@ -720,38 +754,48 @@ BuildResult build(const BuildOptions& opt) {
         if (!st.second.map.empty()) apply_delta(index, st.second, st.first, led);
     lap("apply");
     // the texts the game knows: content\*\<lang>.w3strings, the DLC folders, and the mods' own .w3strings (the
-    // later mod first); a language is read when needed
+    // later mod first). The mods' text files are the ones their folders were listed with at the start: no mod is
+    // asked for a file it does not have. A language is read when needed; when every language will be, they are
+    // read together on several threads.
     std::map<std::string, std::vector<std::unique_ptr<W3Strings>>> game_texts;
     std::string dlc_root = opt.dlc_dir.empty() ? opt.game + "\\dlc" : opt.dlc_dir;
+    const auto content_dirs = list_dirs(opt.game + "\\content");
+    const auto dlc_dirs = list_dirs(dlc_root);
+    auto load_lang = [&](const std::string& lang) {
+        std::vector<std::unique_ptr<W3Strings>> v;
+        std::vector<std::string> files;
+        std::string name = lang + ".w3strings";
+        for (auto it2 = mods.rbegin(); it2 != mods.rend(); ++it2)
+            for (auto& f : scans[*it2].texts)
+                if (lower(fs::u8path(f.path).filename().u8string()) == name) files.push_back(f.path);
+        for (auto& d : content_dirs) files.push_back(opt.game + "\\content\\" + d + "\\" + name);
+        for (auto& d : dlc_dirs) files.push_back(dlc_root + "\\" + d + "\\content\\" + name);
+        for (auto& f : files) {
+            auto t = std::make_unique<W3Strings>();
+            if (t->load(f)) v.push_back(std::move(t));
+        }
+        return v;
+    };
     auto game_text = [&](const std::string& lang, const std::string& key, std::string& out) {
         auto it = game_texts.find(lang);
-        if (it == game_texts.end()) {
-            auto& v = game_texts[lang];
-            std::vector<std::string> files;
-            for (auto it2 = mods.rbegin(); it2 != mods.rend(); ++it2)
-                files.push_back(opt.mods_dir + "\\" + *it2 + "\\content\\" + lang + ".w3strings");
-            for (auto& d : list_dirs(opt.game + "\\content"))
-                files.push_back(opt.game + "\\content\\" + d + "\\" + lang + ".w3strings");
-            for (auto& d : list_dirs(dlc_root))
-                files.push_back(dlc_root + "\\" + d + "\\content\\" + lang + ".w3strings");
-            for (auto& f : files) {
-                auto s = std::make_unique<W3Strings>();
-                if (s->load(f)) v.push_back(std::move(s));
-            }
-            it = game_texts.find(lang);
-        }
-        for (auto& s : it->second)
-            if (s->by_key(key, out)) return true;
+        if (it == game_texts.end()) it = game_texts.emplace(lang, load_lang(lang)).first;
+        for (auto& t : it->second)
+            if (t->by_key(key, out)) return true;
         return false;
     };
+    static const char* LANGS[] = {"ar", "br", "cn", "cz", "de", "en", "es", "esmx", "fr", "hu", "it", "jp", "kr",
+                                  "pl", "ru", "tr", "ua", "zh"};
+    if (!text_uses.empty() || !diagrams.empty() || !alchemy.empty()) {
+        std::vector<std::vector<std::unique_ptr<W3Strings>>> loaded(std::size(LANGS));
+        parallel_for(loaded.size(), [&](size_t i) { loaded[i] = load_lang(LANGS[i]); }, threads);
+        for (size_t i = 0; i < loaded.size(); i++) game_texts.emplace(LANGS[i], std::move(loaded[i]));
+    }
     if (!appends.empty()) append_texts(index, appends, texts, game_text, led);
 
     // $text on a record that had texts already: the languages a YAML leaves out keep the record's own text, so a
     // translation into one language does not take the others away. (A new record has no texts of its own: the
     // languages left out show the English text.)
     if (!text_uses.empty()) {
-        static const char* LANGS[] = {"ar", "br", "cn", "cz", "de", "en", "es", "esmx", "fr", "hu", "it", "jp", "kr",
-                                      "pl", "ru", "tr", "ua", "zh"};
         std::map<std::pair<std::string, std::string>, Node*> before;     // (tag, name) -> the record as read
         for (auto& kv : base)
             records_of(*kv.second, [&](Node*, Node* el) {
@@ -868,6 +912,36 @@ BuildResult build(const BuildOptions& opt) {
                 warn.push_back("item '" + n + "' was made by the last build and is gone now (mod removed or item "
                                "renamed): saves that hold it lose it");
         }
+    // TW3SE makes items of its own (w3.items in Lua mods) and mounts them through its DLC dlctw3se. A name made
+    // there and by ItemXL is one record twice in the game: which one counts is not certain.
+    if (!opt.tw3se_items.empty()) {
+        Bytes tx;
+        if (read_file(opt.tw3se_items, tx)) {
+            std::string err;
+            auto root = xml_parse(text_of(tx), err);
+            if (!root) {
+                warn.push_back("TW3SE: " + opt.tw3se_items + " not parsed (" + err + ")");
+            } else {
+                std::set<std::pair<std::string, std::string>> mine;
+                for (auto& f : index.owned)
+                    records_of(*f, [&](Node*, Node* el) {
+                        if (el->tag == "item" || el->tag == "ability") mine.insert({el->tag, key_of(*el).second});
+                    });
+                std::set<std::pair<std::string, std::string>> said;
+                std::function<void(const Node&)> walk = [&](const Node& n) {
+                    const std::string* nm = n.attr("name");
+                    if ((n.tag == "item" || n.tag == "ability") && nm && mine.count({n.tag, *nm}) &&
+                        said.insert({n.tag, *nm}).second) {
+                        warn.push_back(n.tag + " '" + *nm + "' is made by ItemXL and by a TW3SE Lua mod (w3.items): "
+                                       "rename one of them");
+                        yaml_warnings++;
+                    }
+                    for (auto& c : n.children) walk(*c);
+                };
+                walk(*root);
+            }
+        }
+    }
     std::string items_body = "# new items of the last ItemXL build\n";
     for (auto& n : made_now) items_body += n + "\n";
     bool own_dlc = false;
@@ -935,11 +1009,37 @@ BuildResult build(const BuildOptions& opt) {
     // Stage the output into a temporary folder and swap it in at the end, so a failed or interrupted build does not
     // leave a half-written mod folder behind.
     std::string stage_mod = opt.out_mod + ".tmp";
+    std::string content = stage_mod + "\\content";
+    bool packed = false;
+    // TW3SE's text files (tw3se\strings\<lang>.txt), one "key = text" per line
+    auto strings_body = [](const std::map<std::string, std::string>& lang_texts) {
+        std::string body = "# generated by ItemXL\n";
+        for (auto& kv : lang_texts) {
+            std::string esc;
+            for (char c : kv.second) {
+                if (c == '\r') continue;                       // (a line of the text file ends with \n only)
+                esc += c == '\n' ? std::string("\\n") : std::string(1, c);
+            }
+            body += kv.first + " = " + esc + "\n";
+        }
+        return body;
+    };
+    if (opt.live) {
+        // the game's files stay as they are while it runs; the caller mounts what changed. The text files are
+        // plain files of the output mod: they are written, TW3SE reads them again at the latest at the next start
+        res.files = out_files;
+        for (auto& lt : texts) {
+            std::string p = opt.out_mod + "\\tw3se\\strings\\" + lt.first + ".txt";
+            make_dirs(opt.out_mod + "\\tw3se\\strings");
+            std::string body = strings_body(lt.second);
+            Bytes old;
+            if (!read_file(p, old) || text_of(old) != body) write_file(p, body.data(), body.size());
+        }
+    } else {
     {
         std::error_code sec;
         fs::remove_all(fs::u8path(stage_mod), sec);
     }
-    std::string content = stage_mod + "\\content";
     if (!look.textures.empty()) {
         Bytes tc = write_texture_cache(look.textures);
         make_dirs(content);
@@ -949,7 +1049,6 @@ BuildResult build(const BuildOptions& opt) {
         }
         report.push_back("[tex]    " + std::to_string(look.textures.size()) + " texture(s) in " + std::string(OUTPUT_MOD) + "\\content\\texture.cache");
     }
-    bool packed = false;
     if (!out_files.empty()) {
         std::string err;
         packed = write_content(content, out_files, err);
@@ -958,16 +1057,7 @@ BuildResult build(const BuildOptions& opt) {
     for (auto& lt : texts) {
         std::string p = stage_mod + "\\tw3se\\strings\\" + lt.first + ".txt";
         make_dirs(stage_mod + "\\tw3se\\strings");
-        std::string body = "# generated by ItemXL\n";
-        for (auto& kv : lt.second) {
-            std::string t = kv.second;
-            std::string esc;
-            for (char c : t) {
-                if (c == '\r') continue;                       // (a line of the text file ends with \n only)
-                esc += c == '\n' ? std::string("\\n") : std::string(1, c);
-            }
-            body += kv.first + " = " + esc + "\n";
-        }
+        std::string body = strings_body(lt.second);
         if (!write_file(p, body.data(), body.size())) { res.ok = false; warn.push_back("cannot write " + p); }
         report.push_back("[text]   " + std::string(OUTPUT_MOD) + "\\tw3se\\strings\\" + lt.first + ".txt");
     }
@@ -976,7 +1066,7 @@ BuildResult build(const BuildOptions& opt) {
     {
         char id[32];
         std::snprintf(id, sizeof id, "%016llx", (unsigned long long)fnv1a64(stamp));
-        std::string ws = itemxl_script(id, (int)led.errors.size(), (int)yaml_warnings);
+        std::string ws = itemxl_script(id, led.errors);
         make_dirs(content + "\\scripts\\local");
         if (!write_file(content + "\\scripts\\local\\itemxl.ws", ws.data(), ws.size())) {
             res.ok = false;
@@ -989,6 +1079,7 @@ BuildResult build(const BuildOptions& opt) {
         res.ok = false;
         warn.push_back("cannot write " + items_path);
     }
+    }   // not live
 
     lap("write");
     double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
@@ -1022,6 +1113,13 @@ BuildResult build(const BuildOptions& opt) {
     res.conflicts = (int)led.conflicts.size();
     res.errors = (int)led.errors.size();
     res.report = r.str();
+    if (opt.live) {
+        make_dirs(opt.out_mod);
+        write_file(opt.out_mod + "\\itemxl_report.txt", res.report.data(), res.report.size());
+        log("live build: " + std::to_string(dirty.size()) + " files, " + std::to_string(led.conflicts.size()) +
+            " conflicts, " + std::to_string(led.errors.size()) + " errors (" + tbuf + "s)");
+        return res;
+    }
     write_file(stage_mod + "\\itemxl_report.txt", res.report.data(), res.report.size());
     if (res.ok) write_file(stage_mod + "\\itemxl.stamp", stamp.data(), stamp.size());
     if (res.ok) {

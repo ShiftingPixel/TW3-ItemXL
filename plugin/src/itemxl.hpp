@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <optional>
 #include <set>
@@ -36,6 +37,9 @@ using Bytes = std::vector<uint8_t>;
 bool read_file(const std::string& path, Bytes& out);
 bool write_file(const std::string& path, const void* data, size_t n);
 void make_dirs(const std::string& dir);
+// fn(0) .. fn(n-1) on `threads` threads (1: in order on this one); fn must only touch its own index's data
+void parallel_for(size_t n, const std::function<void(size_t)>& fn, unsigned threads);
+unsigned build_threads();   // the threads a build uses: the processor's, at most 8
 
 // ----------------------------------------------------------- compression ----
 
@@ -201,8 +205,8 @@ struct W3Strings {
     uint32_t version = 0, magic = 0;
     bool bytes = false;     // texts as UTF-8 bytes (Remastered); else UTF-16 units
     size_t start = 0;
-    std::map<uint32_t, std::pair<uint32_t, uint32_t>> entries;   // id -> (offset, length)
-    std::map<uint32_t, uint32_t> ids_by_hash;                     // key hash -> id
+    std::unordered_map<uint32_t, std::pair<uint32_t, uint32_t>> entries;   // id -> (offset, length)
+    std::unordered_map<uint32_t, uint32_t> ids_by_hash;                  // key hash -> id
     bool load(const std::string& path);
     bool text(uint32_t id, std::string& out) const;
     bool by_key(const std::string& key, std::string& out) const;
@@ -326,8 +330,12 @@ struct BuildOptions {
     std::string out_mod;         // folder of the output mod, usually <mods_dir>\mod00000_ItemXL
     std::string dlc_dir;         // DLC folders (each with content\); "" = <game>\dlc
     std::string environment;     // TW3SE and game build; part of the stamp, so an update of either rebuilds
+    std::string tw3se_items;     // TW3SE's own item XML (w3.items of Lua mods): a name made there and by ItemXL is a
+                                 // warning; "" = not looked at
     bool auto_import = true;
     bool force = false;          // build even when nothing changed
+    bool live = false;           // while the game runs: the output stays in memory (BuildResult::files), nothing is
+                                 // written but the report, and the stamp stays old so the next start builds again
     std::function<void(const std::string&)> log;
 };
 
@@ -336,11 +344,30 @@ struct BuildResult {
     bool ok = true;
     int files_written = 0, conflicts = 0, errors = 0;
     std::string report;          // text of itemxl_report.txt
+    std::map<std::string, Bytes> files;   // live builds: depot path -> bytes of the output's content
+    std::vector<std::string> yaml_files;  // every YAML file of the mods and of <game>\bin\itemxl the build looked at
 };
+
+// ------------------------------------------------------------------ live ----
+// What a build changed against the output the game has loaded (live.cpp), as one definitions XML to mount.
+struct LiveDelta {
+    std::string xml;                  // "" when no record changed
+    int records = 0;
+    std::vector<std::string> names;   // "item 'Name'" per record in the delta
+    std::vector<std::pair<std::string, std::string>> keys;   // (tag, name) per record in the delta
+    std::string xml_plus;             // the same for the New Game Plus sets (items_plus, abilities_plus)
+    int records_plus = 0;
+    std::vector<std::string> names_plus;
+    std::vector<std::pair<std::string, std::string>> keys_plus;
+    std::vector<std::string> notes;   // what waits for the next start
+};
+LiveDelta live_delta(const std::map<std::string, Bytes>& before, const std::map<std::string, Bytes>& after);
+// every file of a bundle: depot path -> bytes (the output the game loaded at the start)
+std::map<std::string, Bytes> bundle_files(const std::string& bundle);
 
 BuildResult build(const BuildOptions& opt);
 std::string serialize_def(const DefFile& f);
 // The WitcherScript part (script.cpp): notifications after loading a save (missing items, build problems).
-std::string itemxl_script(const std::string& build_id, int errors, int warnings);   // the text of itemxl.ws
+std::string itemxl_script(const std::string& build_id, const std::vector<std::string>& errors);   // the text of itemxl.ws
 
 }  // namespace itemxl

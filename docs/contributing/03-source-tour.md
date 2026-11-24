@@ -7,7 +7,7 @@ All sources are in `plugin/src/`. `itemxl.hpp` declares the core and is the best
 
 | File | Content |
 |---|---|
-| `plugin.cpp` | the TW3SE plugin: `TW3SE_PluginQuery`, `TW3SE_PluginLoad` (finds the folders, runs the build, logs), the console command `itemxl` |
+| `plugin.cpp` | the TW3SE plugin: `TW3SE_PluginQuery`, `TW3SE_PluginLoad` (finds the folders, runs the build, logs), the console command `itemxl`; live changes: `watch_loop` (the watching thread), `live_build`, `mount_delta` (the Lua chunk that mounts), `TW3SE_PluginUnload` |
 | `cli.cpp` | `itemxl-cli`: argument parsing and one block per command; the test helpers (`unpack`, `pack`, `extract`, `roundtrip`, `yaml`, `cr2w`, `xbm`, `reddlc`) live here too |
 | `version.hpp` | the version, the only place it is set |
 
@@ -18,7 +18,8 @@ All sources are in `plugin/src/`. `itemxl.hpp` declares the core and is the best
 | `build.cpp` | `build()`: stamp, reading the game and the mods, rules (`$requires`, `$after`, `$if`), the two passes, texts, appearances, checks, report, output. `mod_order` reads `mods.settings`, `scan_files` lists a folder once for stamp and build. |
 | `model.cpp` | records and deltas. `Index` (kind, name → copies), `targets` (copies a change goes to), `apply_delta`, `apply_record` (one record: attributes, lists, stats, operations), `apply_where` and `where_match` (`$where`), `apply_extends` (`extend` copies), `split_new` and `create` (new records), `resolve_from` (`!append-from`), `expand` (`$instances`, YAML tags), `shortcuts` (`$sell`, `$loot`, `$recipe`, `$alchemy`), `take_texts` and `append_texts` (`$text`), `diagram_names` and `alchemy_names` (names of diagrams and recipe items), `diff_files` (whole-file imports), `Ledger` (conflicts), `Catalog`, `validate`, `check_new_items` |
 | `appearance.cpp` | `$appearance`: `take_appearances` collects the requests, `build_appearances` copies and retargets templates, packs textures and icons, checks files and dyes, adds the DDS warnings |
-| `script.cpp` | `itemxl_script`: the generated `itemxl.ws` |
+| `script.cpp` | `itemxl_script`: the generated `itemxl.ws` and its notices |
+| `live.cpp` | `live_delta`: the records a live build changed against the loaded output, as the XMLs to mount (normal and New Game Plus); `bundle_files` |
 
 ## Formats
 
@@ -43,7 +44,7 @@ All sources are in `plugin/src/`. `itemxl.hpp` declares the core and is the best
 
 | File | Content |
 |---|---|
-| `util.cpp` | strings (`lower`, `trim` with Unicode spaces, `split`), hashes (`fnv1a64`, `crc32`), files (`read_file`, `write_file`, `make_dirs`), number formatting (`fmt_double`) |
+| `util.cpp` | strings (`lower`, `trim` with Unicode spaces, `split`), hashes (`fnv1a64`, `crc32`), files (`read_file`, `write_file`, `make_dirs`), number formatting (`fmt_double`), threads (`parallel_for`, `build_threads`) |
 
 ## Outside `plugin/src`
 

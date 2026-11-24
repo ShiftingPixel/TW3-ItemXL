@@ -95,8 +95,10 @@ bool W3Strings::load(const std::string& path) {
     size_t p = 10;
     uint32_t n;
     if (!vlq(data, p, n) || p + (size_t)n * 12 > data.size()) return false;
+    entries.reserve(n);
     for (uint32_t i = 0; i < n; i++, p += 12) entries[rd32(data, p) ^ magic] = {rd32(data, p + 4), rd32(data, p + 8)};
     if (!vlq(data, p, n) || p + (size_t)n * 8 > data.size()) return false;
+    ids_by_hash.reserve(n);
     for (uint32_t i = 0; i < n; i++, p += 8) ids_by_hash.emplace(rd32(data, p), rd32(data, p + 4) ^ magic);
     uint32_t size;
     if (!vlq(data, p, size)) return false;

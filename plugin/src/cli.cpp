@@ -2,6 +2,7 @@
 //
 //   itemxl-cli build --game <W3> [--mods <Mods folder>] [--dlc <dlc folder>] [--settings <mods.settings>]
 //                    [--out <mod folder>] [--force]
+//                    [--live <loaded blob0.bundle> [--delta <file.xml>]]   the live build and what it would mount
 //   itemxl-cli import <.bundle> --game <W3>       the delta of a mod's whole-file overrides, as JSON
 //   itemxl-cli yaml <file.yaml>                    a YAML file as JSON (to compare with PyYAML)
 //   itemxl-cli reddlc <out> <id> <class> <path>...  a DLC definition (.reddlc)
@@ -68,6 +69,7 @@ static const char* USAGE =
     "  new <name> --base <record> [--tag item] [--out file.yaml]\n"
     "  schema [--out itemxl.schema.json] [--vscode <folder>]\n"
     "  build [--mods <folder>] [--dlc <folder>] [--settings <mods.settings>] [--out <folder>] [--force]\n"
+    "        [--tw3se-items <tw3se_items.xml>]\n"
     "  import <.bundle>\n"
     "  retarget <in> <out> <old path>=<new path> ...\n";
 
@@ -382,9 +384,29 @@ int main(int argc, char** argv) {
         opt.mods_settings = arg(argc, argv, "--settings", "");
         opt.out_mod = arg(argc, argv, "--out", opt.mods_dir + "\\mod00000_ItemXL");
         opt.dlc_dir = arg(argc, argv, "--dlc", "");
+        opt.tw3se_items = arg(argc, argv, "--tw3se-items", "");
         opt.force = flag(argc, argv, "--force");
         opt.auto_import = !flag(argc, argv, "--no-auto-import");
         opt.log = [](const std::string& m) { std::fprintf(stderr, "[ItemXL] %s\n", m.c_str()); };
+        // --live <blob0.bundle of the output the game loaded> [--delta <file.xml>]: the build the plugin makes while
+        // the game runs, and the definitions XML it would mount
+        std::string loaded = arg(argc, argv, "--live", "");
+        if (!loaded.empty()) {
+            opt.live = opt.force = true;
+            BuildResult r = build(opt);
+            LiveDelta d = live_delta(bundle_files(loaded), r.files);
+            std::string out = arg(argc, argv, "--delta", "");
+            if (!out.empty()) write_file(out, d.xml.data(), d.xml.size());
+            std::printf("records: %d\n", d.records);
+            for (auto& n : d.names) std::printf("  %s\n", n.c_str());
+            std::printf("New Game Plus records: %d\n", d.records_plus);
+            for (auto& n : d.names_plus) std::printf("  %s\n", n.c_str());
+            std::string out_plus = arg(argc, argv, "--delta-plus", "");
+            if (!out_plus.empty()) write_file(out_plus, d.xml_plus.data(), d.xml_plus.size());
+            std::printf("next start: %zu\n", d.notes.size());
+            for (auto& n : d.notes) std::printf("  %s\n", n.c_str());
+            return r.ok ? 0 : 1;
+        }
         BuildResult r = build(opt);
         if (r.built) std::printf("%s", r.report.c_str());
         return r.ok ? 0 : 1;

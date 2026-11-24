@@ -5,7 +5,9 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <atomic>
 #include <fstream>
+#include <thread>
 
 namespace itemxl {
 
@@ -69,18 +71,18 @@ uint64_t fnv1a64(const std::string& s) {
 }
 
 uint32_t crc32(const uint8_t* data, size_t n, uint32_t crc) {
-    static uint32_t table[256];
-    static bool ready = false;
-    if (!ready) {
+    struct Table { uint32_t v[256]; };
+    static const Table table = [] {             // a static local is initialised thread-safely
+        Table t;
         for (uint32_t i = 0; i < 256; i++) {
             uint32_t c = i;
             for (int k = 0; k < 8; k++) c = (c & 1) ? 0xEDB88320u ^ (c >> 1) : c >> 1;
-            table[i] = c;
+            t.v[i] = c;
         }
-        ready = true;
-    }
+        return t;
+    }();
     crc = ~crc;
-    for (size_t i = 0; i < n; i++) crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >> 8);
+    for (size_t i = 0; i < n; i++) crc = table.v[(crc ^ data[i]) & 0xFF] ^ (crc >> 8);
     return ~crc;
 }
 
@@ -119,6 +121,26 @@ bool write_file(const std::string& path, const void* data, size_t n) {
 void make_dirs(const std::string& dir) {
     std::error_code ec;
     std::filesystem::create_directories(u8path(dir), ec);
+}
+
+unsigned build_threads() {
+    unsigned n = std::thread::hardware_concurrency();
+    return n == 0 ? 1 : n > 8 ? 8 : n;
+}
+
+void parallel_for(size_t n, const std::function<void(size_t)>& fn, unsigned threads) {
+    if (threads <= 1 || n < 2) {
+        for (size_t i = 0; i < n; i++) fn(i);
+        return;
+    }
+    std::atomic<size_t> next{0};
+    auto work = [&] {
+        for (size_t i; (i = next.fetch_add(1)) < n;) fn(i);
+    };
+    std::vector<std::thread> pool;
+    for (unsigned t = 1; t < threads && t < n; t++) pool.emplace_back(work);
+    work();
+    for (auto& t : pool) t.join();
 }
 
 }  // namespace itemxl

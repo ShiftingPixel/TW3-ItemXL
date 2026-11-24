@@ -56,10 +56,14 @@ The [documentation](docs/README.md) has three parts:
 - **For TweakXL and ArchiveXL users:** how the Cyberpunk 2077 frameworks [map to ItemXL](docs/tweakxl-archivexl/01-witcher3-for-cyberpunk-modders.md).
 - **For contributors:** [building and testing](docs/contributing/01-building-and-testing.md), architecture, and file formats.
 
+What changed in each version: [Changelog](CHANGELOG.md).
+
 ## Limitations
 
 - ItemXL does not create models or textures. It packs the ones a mod brings; see the [Witcher 3 REDkit documentation](https://cdprojektred.atlassian.net/wiki/spaces/W3REDkit) for making them.
-- Changes take effect at the next game start; records are not changed while the game runs.
+- Changes to records take effect at the next game start, or while the game runs with TW3SE 1.4.0 or later
+  ([more](docs/modding/09-report-and-console.md#changes-while-the-game-runs)). Removed records, models, textures and
+  icons always wait for the next start.
 - Values that scripts change at runtime are outside ItemXL's merge and report.
 - Generated bundle and texture data is stored without compression, which uses additional disk space.
 

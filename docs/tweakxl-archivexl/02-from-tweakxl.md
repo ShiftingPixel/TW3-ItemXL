@@ -52,8 +52,8 @@ item:
 
 | | TweakXL | ItemXL |
 |---|---|---|
-| when changes are applied | while the game runs, to TweakDB in memory | at game start, before the game reads its files; the result is a mod the game loads |
-| reloading | `TweakXL.Reload()` | restart the game |
+| when changes are applied | while the game runs, to TweakDB in memory | at game start, before the game reads its files; the result is a mod the game loads. With TW3SE 1.4.0 or later, changed records are also loaded while the game runs |
+| reloading | `TweakXL.Reload()` | automatic when a YAML file is saved, or `/itemxl reload` in the TW3SE console ([more](../modding/09-report-and-console.md#changes-while-the-game-runs)); models and textures need a restart |
 | mods that replace data files | not applicable | imported and turned into changes ([more](../modding/08-load-order-and-compatibility.md#mods-that-replace-whole-files)) |
 | two mods set the same value | the later one wins | the winner follows the game's mod order; the report lists the conflict |
 | load order | the files of `r6\tweaks` as the folder lists them (alphabetical on Windows); names starting with `_`, `#`, `$`, `!` first, `^` last | the game's mod order ([Load order](../modding/08-load-order-and-compatibility.md#the-load-order)) |

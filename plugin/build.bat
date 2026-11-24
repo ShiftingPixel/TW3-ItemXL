@@ -5,7 +5,7 @@ rem   build.bat
 setlocal
 cd /d "%~dp0"
 set "SDK=..\third_party\TW3SE-SDK\include"
-set "SRC=src\util.cpp src\bundle.cpp src\xml.cpp src\yaml.cpp src\model.cpp src\pack.cpp src\reddlc.cpp src\w3strings.cpp src\build.cpp src\script.cpp src\browse.cpp src\cr2w.cpp src\texture.cpp src\appearance.cpp"
+set "SRC=src\util.cpp src\bundle.cpp src\xml.cpp src\yaml.cpp src\model.cpp src\pack.cpp src\reddlc.cpp src\w3strings.cpp src\build.cpp src\script.cpp src\browse.cpp src\cr2w.cpp src\texture.cpp src\appearance.cpp src\live.cpp"
 set "FLAGS=-std=c++17 -O2 -target x86_64-windows-gnu -Isrc -I%SDK% -Wall -static"
 if not exist out mkdir out
 

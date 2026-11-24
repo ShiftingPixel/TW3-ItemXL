@@ -124,21 +124,22 @@ bool zlib_inflate(const uint8_t* src, size_t n, Bytes& out, size_t limit) {
             out.insert(out.end(), br.p + br.pos, br.p + br.pos + len);
             br.pos += len;
         } else if (type == 1) {                         // fixed Huffman
-            static Huffman lit, dist;
-            static bool ready = false;
-            if (!ready) {
+            // made once; a static local is initialised thread-safely (files are read on several threads)
+            struct Fixed { Huffman lit, dist; };
+            static const Fixed fixed = [] {
+                Fixed f;
                 short l[288];
                 int s = 0;
                 for (; s < 144; s++) l[s] = 8;
                 for (; s < 256; s++) l[s] = 9;
                 for (; s < 280; s++) l[s] = 7;
                 for (; s < 288; s++) l[s] = 8;
-                build(lit, l, 288);
+                build(f.lit, l, 288);
                 for (s = 0; s < 30; s++) l[s] = 5;
-                build(dist, l, 30);
-                ready = true;
-            }
-            if (!codes(br, out, lit, dist, limit)) return false;
+                build(f.dist, l, 30);
+                return f;
+            }();
+            if (!codes(br, out, fixed.lit, fixed.dist, limit)) return false;
         } else if (type == 2) {                         // dynamic Huffman
             static const short ORDER[19] = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
             int nlen = br.bits(5) + 257, ndist = br.bits(5) + 1, ncode = br.bits(4) + 4;

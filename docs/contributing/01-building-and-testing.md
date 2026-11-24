@@ -49,13 +49,14 @@ python tests\run_all.py --build
 
 | Step | Checks |
 |---|---|
-| `yaml` | the C++ YAML reader against PyYAML (with ItemXL's tags) for every YAML file of the tests and examples, plus broken and hostile input |
+| `yaml` | the C++ YAML reader against PyYAML (with ItemXL's tags, and merge keys as the YAML spec has them: PyYAML 6.0.4 differs there) for every YAML file of the tests and examples, plus broken and hostile input |
 | `browse` | `itemxl-cli search`, `show`, and `new` |
 | `schema` | the VS Code schema accepts every valid test YAML and catches the typos of the `typos` case |
-| `script` | the generated `itemxl.ws` and the notice for items that disappeared |
+| `script` | the generated `itemxl.ws`, its notices (English only, the mods whose changes failed) and the warning for items that disappeared |
 | `appearance` | the resource formats against the game's own files (templates, models, textures, icons) and a build of the look example |
 | `case …` | every `tests\cases\*.json` (see below) |
 | `output` | a rebuild replaces the output in place, removes stale files, and keeps unchanged output |
+| `live` | a live build (`--live`) of the examples with one price changed: one changed record with `on_conflict="replace"` in the normal and the New Game Plus XML, nothing written to the game's files, nothing against the same build |
 | `roundtrip` | every definition XML of the game read and written again; the written text reads back the same |
 
 The tests work in `%TEMP%\itemxl-tests`.
@@ -79,6 +80,7 @@ together in the work folder, builds them with `itemxl-cli build`, and checks the
   },
   "dlc": {"dlcx": {"pack": "dlc/dlcx"}},
   "settings": {"modA": [1, 0], "modB": [1, 1]},
+  "tw3se_items": "tw3se_items.xml",
   "expect": {
     "conflicts": 0,
     "errors": 0,
@@ -99,7 +101,8 @@ Sources of a mod or DLC folder:
 | `pack` | loose files of the case, packed into `content\blob0.bundle` |
 | `override` | a mod that replaces whole game files, made at test time from the game's own files with one attribute changed (game files are not shipped) |
 
-`settings` holds `[Enabled, Priority]` per mod. Expectations: `conflicts`, `errors`, `warnings` (counts; warnings
+`settings` holds `[Enabled, Priority]` per mod. `tw3se_items` names a file of the case that stands for TW3SE's
+`tw3se_items.xml` (items of TW3SE Lua mods). Expectations: `conflicts`, `errors`, `warnings` (counts; warnings
 about the game's own files are not counted), `errors_contain_cpp`, `warnings_contain`, `report_contains`, `contains`
 and `absent` (text in a written file), `written` and `not_written` (files), `texts` and `absent_texts` (language,
 text).

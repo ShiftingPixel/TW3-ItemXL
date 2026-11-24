@@ -87,7 +87,9 @@ start. The installed game files are never changed.
 
 ## What ItemXL does not do
 
-- It does not change records while the game runs. A change takes effect at the next game start.
+- It does not change the game's records in memory the way TweakXL does. The build runs at the game start; with
+  TW3SE 1.4.0 or later, a saved YAML file is also built again while the game runs and only the changed records are
+  loaded into the game (see [Changes while the game runs](09-report-and-console.md#changes-while-the-game-runs)).
 - It does not make models or textures. It packs the ones you bring (see [Appearance](07-appearance.md)).
 - It does not merge scripts. Script mods are a separate topic (see
   [Load order and compatibility](08-load-order-and-compatibility.md#script-mods)).

@@ -32,6 +32,17 @@ A script does not compile. The TW3SE log names the file and line. Common causes:
 - `$base` copies the game's record, not what other mods made of it. A balance mod's change to the original does not
   reach your copy; set the value yourself or use [`$if`](06-rules.md#example-a-patch-inside-your-own-mod).
 
+## A change made while the game runs does not show
+
+- Is TW3SE 1.4.0 or later installed? The TW3SE log says "TW3SE 1.4.0 or later is needed" otherwise.
+- A new YAML file, or a mod added after the game started, is not watched: use `/itemxl reload`.
+- After saving, the TW3SE log has `live:` lines: the records that were loaded, and what waits for the next start
+  (removed records, models, textures, icons).
+- An item already in an inventory may keep what it had (rune slots, for example, only ever grow); look at a new one.
+- New Game Plus changes are only loaded in a New Game Plus game.
+- `/itemxl live off` may have turned the watching off; `/itemxl live on` turns it on again. If a look at the files
+  ever took too long, the log says the watching stopped for the session.
+
 ## A new item is missing or nameless
 
 - Not at the merchant: is the loot list name right (`itemxl-cli search _store_ --tag loot`)?

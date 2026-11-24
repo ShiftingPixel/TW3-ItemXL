@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<redxml>
+<definitions>
+	<abilities>
+		<ability name="ItemXL Example Blade _Stats">
+			<quality type="add" min="1"/>
+		</ability>
+		<ability name="mymod_other _Stats"/>
+	</abilities>
+	<items>
+		<item name="ItemXL Example Blade" category="steelsword" price="10"/>
+		<item name="mymod_other" category="potion" price="5"/>
+	</items>
+</definitions>
+</redxml>

@@ -33,6 +33,10 @@ the game already sorts it there, before the two other mods that tools create:
   Script Merger merged are then left unused, as long as ItemXL comes first.
 - **TW3SE's loose files:** ItemXL reads `mod00000_TW3SE_Files` like any other mod, so a definition file put there is
   merged too.
+- **TW3SE's own items:** Lua mods can make items with `w3.items` (TW3SE 1.4.0 and later). TW3SE keeps them in a DLC
+  of its own, `dlctw3se`. If a Lua mod and an ItemXL mod both add an item or ability with the same name, the game
+  loads two definitions for it, and it is not certain which one applies. The report lists each such name. Rename
+  one of the two.
 
 A mod that **is** listed in `mods.settings` comes before the ones that are not. If such a mod, or
 `mod0000_MergedFiles`, replaces a definition file ItemXL writes and comes before the output mod, the game reads that
